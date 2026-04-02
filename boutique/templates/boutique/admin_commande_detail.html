@@ -1,0 +1,98 @@
+{% extends 'boutique/base.html' %}
+{% block content %}
+<style>
+.detail-wrapper{max-width:800px;margin:3rem auto;padding:0 2rem}
+.detail-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:2rem;
+  font-weight:700;
+  margin-bottom:2rem;
+  padding-bottom:1rem;
+  border-bottom:2px solid var(--gold);
+}
+.detail-title span{color:var(--gold);font-style:italic}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:2rem}
+.info-card{background:var(--cream);padding:1.5rem}
+.info-label{font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--gray);margin-bottom:0.4rem}
+.info-value{font-size:0.95rem;font-weight:500;color:var(--black)}
+.lignes-table{width:100%;border-collapse:collapse;margin-bottom:2rem}
+.lignes-table th{font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--gray);padding:0.75rem;text-align:left;border-bottom:2px solid var(--border)}
+.lignes-table td{padding:0.85rem;font-size:0.85rem;border-bottom:1px solid var(--border)}
+.total-bar{background:var(--black);color:var(--white);padding:1rem 1.5rem;display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem}
+.total-bar span{color:var(--gold);font-size:1.2rem;font-weight:600}
+.statut-form{display:flex;gap:1rem;align-items:center}
+.form-input{border:1px solid var(--border);padding:10px 14px;font-family:'Montserrat',sans-serif;font-size:0.85rem;outline:none;background:var(--white)}
+.form-input:focus{border-color:var(--gold)}
+</style>
+
+<div class="detail-wrapper">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;padding-bottom:1rem;border-bottom:2px solid var(--gold)">
+    <h2 class="detail-title" style="border:none;margin:0;padding:0">
+      Commande <span>#{{ commande.id }}</span>
+    </h2>
+    <a href="/mon-admin/" class="btn-outline">← Retour</a>
+  </div>
+
+  <div class="info-grid">
+    <div class="info-card">
+      <p class="info-label">Client</p>
+      <p class="info-value">{{ commande.nom_client }}</p>
+    </div>
+    <div class="info-card">
+      <p class="info-label">Téléphone</p>
+      <p class="info-value">{{ commande.telephone }}</p>
+    </div>
+    <div class="info-card">
+      <p class="info-label">Adresse</p>
+      <p class="info-value">{{ commande.adresse }}</p>
+    </div>
+    <div class="info-card">
+      <p class="info-label">Date</p>
+      <p class="info-value">{{ commande.date_commande|date:"d/m/Y à H:i" }}</p>
+    </div>
+    {% if commande.notes %}
+    <div class="info-card" style="grid-column:1/-1">
+      <p class="info-label">Notes</p>
+      <p class="info-value">{{ commande.notes }}</p>
+    </div>
+    {% endif %}
+  </div>
+
+  <table class="lignes-table">
+    <thead>
+      <tr>
+        <th>Produit</th>
+        <th>Prix Unitaire</th>
+        <th>Quantité</th>
+        <th>Sous-total</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for ligne in commande.lignes.all %}
+      <tr>
+        <td><strong>{{ ligne.produit.nom }}</strong></td>
+        <td>{{ ligne.prix_unitaire }} DT</td>
+        <td>× {{ ligne.quantite }}</td>
+        <td style="color:var(--gold);font-weight:600">{{ ligne.prix_unitaire|floatformat:3 }} DT</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class="total-bar">
+    <span style="color:white;font-size:0.8rem;letter-spacing:2px;text-transform:uppercase">Total</span>
+    <span>{{ commande.total }} DT</span>
+  </div>
+
+  <form method="POST" class="statut-form">
+    {% csrf_token %}
+    <select name="statut" class="form-input">
+      <option value="nouveau" {% if commande.statut == 'nouveau' %}selected{% endif %}>Nouveau</option>
+      <option value="confirme" {% if commande.statut == 'confirme' %}selected{% endif %}>Confirmé</option>
+      <option value="livre" {% if commande.statut == 'livre' %}selected{% endif %}>Livré</option>
+      <option value="annule" {% if commande.statut == 'annule' %}selected{% endif %}>Annulé</option>
+    </select>
+    <button type="submit" class="btn-primary">Mettre à jour le statut</button>
+  </form>
+</div>
+{% endblock %}

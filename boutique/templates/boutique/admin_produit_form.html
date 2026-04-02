@@ -1,0 +1,115 @@
+{% extends 'boutique/base.html' %}
+{% block content %}
+<style>
+.form-wrapper{max-width:700px;margin:3rem auto;padding:0 2rem}
+.form-title{
+  font-family:'Cormorant Garamond',serif;
+  font-size:2rem;
+  font-weight:700;
+  margin-bottom:2rem;
+  padding-bottom:1rem;
+  border-bottom:2px solid var(--gold);
+}
+.form-title span{color:var(--gold);font-style:italic}
+.form-group{margin-bottom:1.5rem}
+.form-label{
+  display:block;
+  font-size:0.65rem;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  color:var(--gray);
+  margin-bottom:0.5rem;
+}
+.form-input{
+  width:100%;
+  border:1px solid var(--border);
+  padding:12px 16px;
+  font-family:'Montserrat',sans-serif;
+  font-size:0.85rem;
+  outline:none;
+  transition:border-color 0.3s;
+  background:var(--white);
+}
+.form-input:focus{border-color:var(--gold)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.checkbox-group{display:flex;align-items:center;gap:0.75rem}
+.checkbox-group input{width:18px;height:18px;accent-color:var(--gold)}
+.checkbox-group label{font-size:0.85rem;color:var(--black)}
+.form-actions{display:flex;gap:1rem;margin-top:2rem}
+.current-image{
+  margin-top:0.5rem;
+  font-size:0.75rem;
+  color:var(--gray);
+}
+.current-image img{
+  width:80px;
+  height:80px;
+  object-fit:cover;
+  display:block;
+  margin-top:0.5rem;
+  border:1px solid var(--border);
+}
+</style>
+
+<div class="form-wrapper">
+  <h2 class="form-title">{{ action }} un <span>Produit</span></h2>
+
+  <form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="form-group">
+      <label class="form-label">Nom du Produit *</label>
+      <input type="text" name="nom" class="form-input" required
+        value="{% if produit %}{{ produit.nom }}{% endif %}"
+        placeholder="ex: Jebba Brodée Premium">
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Prix (DT) *</label>
+        <input type="number" name="prix" step="0.001" class="form-input" required
+          value="{% if produit %}{{ produit.prix }}{% endif %}"
+          placeholder="0.000">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Catégorie *</label>
+        <select name="categorie" class="form-input">
+          <option value="jebba" {% if produit and produit.categorie == 'jebba' %}selected{% endif %}>Jebba</option>
+          <option value="burnous" {% if produit and produit.categorie == 'burnous' %}selected{% endif %}>Burnous</option>
+          <option value="kaftan" {% if produit and produit.categorie == 'kaftan' %}selected{% endif %}>Kaftan</option>
+          <option value="accessoire" {% if produit and produit.categorie == 'accessoire' %}selected{% endif %}>Accessoire</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Description *</label>
+      <textarea name="description" class="form-input" rows="4"
+        placeholder="Description du produit...">{% if produit %}{{ produit.description }}{% endif %}</textarea>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Image</label>
+      <input type="file" name="image" class="form-input" accept="image/*">
+      {% if produit and produit.image %}
+      <div class="current-image">
+        Image actuelle :
+        <img src="{{ produit.image.url }}" alt="{{ produit.nom }}">
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="form-group">
+      <div class="checkbox-group">
+        <input type="checkbox" name="disponible" id="disponible"
+          {% if not produit or produit.disponible %}checked{% endif %}>
+        <label for="disponible">Produit disponible</label>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn-primary">{{ action }} le Produit</button>
+      <a href="/mon-admin/" class="btn-outline">Annuler</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

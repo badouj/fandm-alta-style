@@ -1,0 +1,18 @@
+{% extends 'boutique/base.html' %}
+{% block content %}
+<div style="max-width:500px;margin:4rem auto;padding:0 2rem;text-align:center">
+  <h2 style="font-family:'Cormorant Garamond',serif;font-size:2rem;margin-bottom:1rem">
+    Supprimer le <span style="color:#e53e3e">Produit</span>
+  </h2>
+  <p style="color:var(--gray);margin-bottom:2rem;font-size:0.9rem">
+    Voulez-vous vraiment supprimer <strong>{{ produit.nom }}</strong> ? Cette action est irréversible.
+  </p>
+  <form method="POST" style="display:flex;gap:1rem;justify-content:center">
+    {% csrf_token %}
+    <button type="submit" style="background:#e53e3e;color:white;border:none;padding:12px 28px;font-family:'Montserrat',sans-serif;font-size:0.72rem;letter-spacing:2px;text-transform:uppercase;cursor:pointer">
+      Oui, Supprimer
+    </button>
+    <a href="/mon-admin/" class="btn-outline">Annuler</a>
+  </form>
+</div>
+{% endblock %}

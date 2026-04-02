@@ -1,0 +1,69 @@
+{% extends 'boutique/base.html' %}
+{% block content %}
+<style>
+.panier-container{max-width:900px;margin:0 auto;padding:3rem 2rem}
+.panier-title{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:300;margin-bottom:2rem;padding-bottom:1rem;border-bottom:1px solid var(--border)}
+.panier-title span{color:var(--gold);font-style:italic}
+.panier-empty{text-align:center;padding:4rem;color:var(--gray)}
+.panier-item{display:grid;grid-template-columns:1fr auto auto;gap:1rem;align-items:center;padding:1rem 0;border-bottom:1px solid var(--border)}
+.item-name{font-family:'Cormorant Garamond',serif;font-size:1.1rem}
+.item-price{color:var(--gold);font-weight:600}
+.remove-btn{background:none;border:none;color:var(--gray);cursor:pointer;font-size:1rem}
+.remove-btn:hover{color:red}
+.panier-total{background:var(--cream);padding:2rem;display:flex;justify-content:space-between;align-items:center;margin-top:2rem;flex-wrap:wrap;gap:1rem}
+.total-label{font-size:0.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--gray);margin-bottom:0.25rem}
+.total-amount{font-family:'Cormorant Garamond',serif;font-size:1.8rem;color:var(--gold)}
+</style>
+
+<div class="panier-container">
+  <h2 class="panier-title">Mon <span>Panier</span></h2>
+  <div id="panierContent"></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function renderPanier() {
+  const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+  const container = document.getElementById('panierContent');
+  if (cart.length === 0) {
+    container.innerHTML = '<div class="panier-empty"><p>Votre panier est vide</p><br><a href="/catalogue/" class="btn-outline">Voir la Collection</a></div>';
+    return;
+  }
+  const total = cart.reduce((s,i) => s + i.prix * i.qty, 0);
+  container.innerHTML = `
+    <div id="items">
+      ${cart.map((item,idx) => `
+        <div class="panier-item">
+          <div>
+            <p class="item-name">${item.nom}</p>
+            <p style="font-size:0.7rem;color:var(--gray)">Quantité: ${item.qty}</p>
+          </div>
+          <p class="item-price">${(item.prix * item.qty).toFixed(3)} DT</p>
+          <button class="remove-btn" onclick="removeItem(${idx})">✕</button>
+        </div>`).join('')}
+    </div>
+    <div class="panier-total">
+      <div>
+        <p class="total-label">Total</p>
+        <p class="total-amount">${total.toFixed(3)} DT</p>
+      </div>
+      <a href="/commande/" class="btn-primary" onclick="saveCart()">Passer la Commande →</a>
+    </div>`;
+}
+
+function removeItem(idx) {
+  let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+  cart.splice(idx, 1);
+  localStorage.setItem('cart', JSON.stringify(cart));
+  updateCartCount();
+  renderPanier();
+}
+
+function saveCart() {
+  // cart already in localStorage
+}
+
+renderPanier();
+</script>
+{% endblock %}

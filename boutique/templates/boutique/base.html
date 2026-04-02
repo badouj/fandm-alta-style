@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>F&M Alta Style</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --gold:#C9A84C;
+  --white:#FFFFFF;
+  --cream:#FAF8F3;
+  --black:#1A1A1A;
+  --dark:#2b2b2b;
+  --gray:#6B6B6B;
+  --border:#e0e0e0;
+}
+body{font-family:'Montserrat',sans-serif;background:var(--white);color:var(--black)}
+
+nav{
+  background:var(--dark);
+  padding:0 2.5rem;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  height:65px;
+  position:sticky;
+  top:0;
+  z-index:100;
+}
+.logo{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.5rem;
+  font-weight:700;
+  letter-spacing:2px;
+  text-decoration:none;
+  color:var(--white);
+}
+.logo span{color:var(--gold)}
+.nav-links{display:flex;gap:2.5rem;list-style:none}
+.nav-links a{
+  text-decoration:none;
+  font-size:0.8rem;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  color:rgba(255,255,255,0.8);
+  font-weight:400;
+  transition:color 0.3s;
+}
+.nav-links a:hover{color:var(--gold)}
+
+.cart-icon-btn{
+  position:relative;
+  background:none;
+  border:none;
+  cursor:pointer;
+  text-decoration:none;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  width:44px;
+  height:44px;
+}
+.cart-icon-btn svg{
+  width:26px;
+  height:26px;
+  stroke:var(--white);
+  fill:none;
+  stroke-width:1.8;
+  transition:stroke 0.3s;
+}
+.cart-icon-btn:hover svg{stroke:var(--gold)}
+.cart-badge{
+  position:absolute;
+  top:4px;
+  right:4px;
+  background:var(--gold);
+  color:var(--white);
+  border-radius:50%;
+  width:18px;
+  height:18px;
+  font-size:0.6rem;
+  font-weight:600;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:'Montserrat',sans-serif;
+}
+
+.btn-primary{
+  background:var(--black);
+  color:var(--white);
+  border:none;
+  padding:12px 28px;
+  font-family:'Montserrat',sans-serif;
+  font-size:0.72rem;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  cursor:pointer;
+  text-decoration:none;
+  display:inline-block;
+  transition:background 0.3s;
+}
+.btn-primary:hover{background:var(--gold)}
+.btn-outline{
+  background:none;
+  color:var(--black);
+  border:1.5px solid var(--black);
+  padding:12px 28px;
+  font-family:'Montserrat',sans-serif;
+  font-size:0.72rem;
+  letter-spacing:2px;
+  text-transform:uppercase;
+  cursor:pointer;
+  text-decoration:none;
+  display:inline-block;
+  transition:all 0.3s;
+}
+.btn-outline:hover{border-color:var(--gold);color:var(--gold)}
+
+/* FOOTER */
+footer{background:#1a1a1a;color:rgba(255,255,255,0.7);margin-top:4rem}
+.footer-grid{
+  display:grid;
+  grid-template-columns:1.5fr 1fr 1fr;
+  gap:3rem;
+  padding:3rem 2.5rem;
+  max-width:1200px;
+  margin:0 auto;
+}
+.footer-logo{
+  font-family:'Cormorant Garamond',serif;
+  font-size:1.4rem;
+  font-weight:700;
+  color:var(--white);
+  margin-bottom:0.75rem;
+  letter-spacing:2px;
+}
+.footer-logo span{color:var(--gold)}
+.footer-logo-sub{font-size:0.7rem;font-weight:300;letter-spacing:4px}
+.footer-slogan{font-size:0.8rem;line-height:1.7;color:rgba(255,255,255,0.5);margin-bottom:1.25rem}
+.footer-socials{display:flex;gap:0.75rem}
+.social-link{
+  width:34px;height:34px;
+  border:1px solid rgba(255,255,255,0.2);
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  color:rgba(255,255,255,0.6);
+  text-decoration:none;
+  transition:all 0.3s;
+}
+.social-link svg{width:14px;height:14px}
+.social-link:hover{border-color:var(--gold);color:var(--gold)}
+.footer-col-title{
+  font-size:0.75rem;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  color:var(--gold);
+  margin-bottom:1.25rem;
+  font-weight:500;
+}
+.footer-link{
+  display:block;
+  text-decoration:none;
+  color:rgba(255,255,255,0.6);
+  font-size:0.85rem;
+  margin-bottom:0.6rem;
+  transition:color 0.3s;
+}
+.footer-link:hover{color:var(--gold)}
+.footer-contact-item{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:0.82rem;
+  color:rgba(255,255,255,0.6);
+  margin-bottom:0.75rem;
+}
+.footer-bottom{
+  border-top:1px solid rgba(255,255,255,0.1);
+  text-align:center;
+  padding:1.25rem;
+  font-size:0.7rem;
+  letter-spacing:1px;
+  color:rgba(255,255,255,0.3);
+}
+.footer-bottom span{color:var(--gold)}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="logo" href="/">F<span>&</span>M <span style="font-size:0.75rem;font-weight:300;letter-spacing:4px">ALTA STYLE</span></a>
+  <ul class="nav-links">
+    <li><a href="/">Accueil</a></li>
+    <li><a href="/catalogue/">Catalogue</a></li>
+  </ul>
+  <a href="/panier/" class="cart-icon-btn">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+      <line x1="3" y1="6" x2="21" y2="6"/>
+      <path d="M16 10a4 4 0 01-8 0"/>
+    </svg>
+    <span class="cart-badge" id="cartCount">0</span>
+  </a>
+</nav>
+
+{% block content %}{% endblock %}
+
+<footer>
+  <div class="footer-grid">
+    <div class="footer-col">
+      <p class="footer-logo">F<span>&</span>M <span class="footer-logo-sub">ALTA STYLE</span></p>
+      <p class="footer-slogan">L'élégance traditionnelle,<br>le style à portée de main.</p>
+      <div class="footer-socials">
+        <a href="#" class="social-link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
+        </a>
+        <a href="#" class="social-link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+        </a>
+        <a href="#" class="social-link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <p class="footer-col-title">Liens rapides</p>
+      <a href="/" class="footer-link">Accueil</a>
+      <a href="/catalogue/" class="footer-link">Catalogue</a>
+      <a href="/panier/" class="footer-link">Mon Panier</a>
+    </div>
+
+    <div class="footer-col">
+      <p class="footer-col-title">Contactez-nous</p>
+      <p class="footer-contact-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="14" height="14"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+        Tunis, Sfax
+      </p>
+      <p class="footer-contact-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="14" height="14"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.67A2 2 0 012 .95h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+        +216 25127263
+      </p>
+      <p class="footer-contact-item">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="14" height="14"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        alta.style2m@gmail.com
+      </p>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <p>© 2026 <span>F&M Alta Style</span> — Tous droits réservés</p>
+  </div>
+</footer>
+
+<script>
+function updateCartCount(){
+  const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+  document.getElementById('cartCount').textContent = cart.reduce((s,i) => s+i.qty, 0);
+}
+updateCartCount();
+</script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

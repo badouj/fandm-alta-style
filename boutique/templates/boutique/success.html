@@ -1,0 +1,10 @@
+{% extends 'boutique/base.html' %}
+{% block content %}
+<div style="text-align:center;padding:5rem 2rem">
+  <div style="font-size:4rem;color:var(--gold);margin-bottom:1.5rem">✓</div>
+  <h2 style="font-family:'Cormorant Garamond',serif;font-size:2rem;margin-bottom:1rem">Commande Confirmée !</h2>
+  <p style="color:var(--gray);font-size:0.85rem;margin-bottom:0.5rem">Merci <strong>{{ commande.nom_client }}</strong> pour votre commande.</p>
+  <p style="color:var(--gray);font-size:0.85rem;margin-bottom:2rem">Nous vous contacterons au <strong>{{ commande.telephone }}</strong> pour confirmer la livraison.</p>
+  <a href="/catalogue/" class="btn-primary">Continuer les Achats</a>
+</div>
+{% endblock %}
