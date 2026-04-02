@@ -1,8 +1,10 @@
 {% extends 'boutique/base.html' %}
+{% load static %}
 {% block content %}
 <style>
-.hero{background:var(--cream);padding:5rem 2rem;text-align:center}
-.hero-subtitle{font-size:0.7rem;letter-spacing:4px;text-transform:uppercase;color:var(--gold);margin-bottom:1rem}
+.hero{position:relative;overflow:hidden;padding:5rem 2rem;text-align:center;background:var(--cream)}
+.hero-video{position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;opacity:0.35;z-index:0}
+.hero>*:not(.hero-video){position:relative;z-index:1}
 .hero-title{font-family:'Cormorant Garamond',serif;font-size:3.5rem;font-weight:300;line-height:1.2;margin-bottom:1.5rem}
 .hero-title em{font-style:italic;color:var(--gold)}
 .hero-desc{font-size:0.85rem;color:var(--gray);max-width:500px;margin:0 auto 2rem;line-height:1.8}
@@ -12,13 +14,17 @@
 .featured-grid{padding:1rem 2rem 4rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:2rem;max-width:1200px;margin:0 auto}
 .feat-card{cursor:pointer;transition:transform 0.3s;text-decoration:none;color:var(--black)}
 .feat-card:hover{transform:translateY(-5px)}
-.feat-img{aspect-ratio:3/4;background:var(--cream);display:flex;align-items:center;justify-content:center;margin-bottom:1rem;font-size:5rem;border:1px solid var(--border)}
+.feat-img{aspect-ratio:3/4;background:var(--cream);display:flex;align-items:center;justify-content:center;margin-bottom:1rem;font-size:5rem;border:1px solid var(--border);overflow:hidden}
+.feat-img img{width:100%;height:100%;object-fit:cover}
 .feat-name{font-family:'Cormorant Garamond',serif;font-size:1.2rem;margin-bottom:0.25rem}
 .feat-cat{font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--gray);margin-bottom:0.5rem}
 .feat-price{font-size:0.9rem;font-weight:600;color:var(--gold)}
 </style>
 
 <div class="hero">
+  <video autoplay muted loop playsinline class="hero-video">
+    <source src="{% static 'videos/hero.mp4' %}" type="video/mp4">
+  </video>
   <h1 class="hero-title">L'élégance du<br><em>Traditionnel Tunisien</em></h1>
   <p class="hero-desc">Découvrez notre collection exclusive de vêtements traditionnels, alliant savoir-faire artisanal et modernité.</p>
   <div class="hero-btns">
@@ -34,7 +40,11 @@
 <div class="featured-grid">
   {% for produit in produits %}
   <a href="/catalogue/" class="feat-card">
-    <div class="feat-img">🥻</div>
+    <div class="feat-img">
+      {% if produit.image %}
+      <img src="{{ produit.image.url }}" alt="{{ produit.nom }}">
+      {% else %}🥻{% endif %}
+    </div>
     <p class="feat-cat">{{ produit.categorie }}</p>
     <p class="feat-name">{{ produit.nom }}</p>
     <p class="feat-price">{{ produit.prix }} DT</p>
