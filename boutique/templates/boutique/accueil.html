@@ -9,16 +9,6 @@
 .hero-title em{font-style:italic;color:var(--gold)}
 .hero-desc{font-size:0.85rem;color:var(--gray);max-width:500px;margin:0 auto 2rem;line-height:1.8}
 .hero-btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
-.section-title{text-align:center;padding:3rem 2rem 1rem;font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:300}
-.section-title span{display:block;font-size:0.65rem;letter-spacing:4px;text-transform:uppercase;color:var(--gold);font-family:'Montserrat',sans-serif;margin-bottom:0.5rem}
-.featured-grid{padding:1rem 2rem 4rem;display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:2rem;max-width:1200px;margin:0 auto}
-.feat-card{cursor:pointer;transition:transform 0.3s;text-decoration:none;color:var(--black)}
-.feat-card:hover{transform:translateY(-5px)}
-.feat-img{aspect-ratio:3/4;background:var(--cream);display:flex;align-items:center;justify-content:center;margin-bottom:1rem;font-size:5rem;border:1px solid var(--border);overflow:hidden}
-.feat-img img{width:100%;height:100%;object-fit:cover}
-.feat-name{font-family:'Cormorant Garamond',serif;font-size:1.2rem;margin-bottom:0.25rem}
-.feat-cat{font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--gray);margin-bottom:0.5rem}
-.feat-price{font-size:0.9rem;font-weight:600;color:var(--gold)}
 </style>
 
 <div class="hero">
@@ -32,25 +22,4 @@
   </div>
 </div>
 
-<div class="section-title">
-  <span>Sélection du Moment</span>
-  Pièces Exclusives
-</div>
-
-<div class="featured-grid">
-  {% for produit in produits %}
-  <a href="/catalogue/" class="feat-card">
-    <div class="feat-img">
-      {% if produit.image %}
-      <img src="{{ produit.image.url }}" alt="{{ produit.nom }}">
-      {% else %}🥻{% endif %}
-    </div>
-    <p class="feat-cat">{{ produit.categorie }}</p>
-    <p class="feat-name">{{ produit.nom }}</p>
-    <p class="feat-price">{{ produit.prix }} DT</p>
-  </a>
-  {% empty %}
-  <p style="color:var(--gray);text-align:center;grid-column:1/-1">Ajoutez des produits depuis l'admin !</p>
-  {% endfor %}
-</div>
 {% endblock %}
