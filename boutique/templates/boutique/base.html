@@ -16,8 +16,7 @@
   --gray:#6B6B6B;
   --border:#e0e0e0;
 }
-body{font-family:'Montserrat',sans-serif;background:var(--white);color:var(--black)}
-
+body{font-family:'Montserrat',sans-serif;background:var(--white);color:var(--black);display:flex;flex-direction:column;min-height:100vh}
 nav{
   background:var(--dark);
   padding:0 2.5rem;
@@ -49,7 +48,6 @@ nav{
   transition:color 0.3s;
 }
 .nav-links a:hover{color:var(--gold)}
-
 .cart-icon-btn{
   position:relative;
   background:none;
@@ -87,7 +85,6 @@ nav{
   justify-content:center;
   font-family:'Montserrat',sans-serif;
 }
-
 .btn-primary{
   background:var(--black);
   color:var(--white);
@@ -118,9 +115,8 @@ nav{
   transition:all 0.3s;
 }
 .btn-outline:hover{border-color:var(--gold);color:var(--gold)}
-
-/* FOOTER */
-footer{background:#1a1a1a;color:rgba(255,255,255,0.7);margin-top:0}
+.main-block{flex:1}
+footer{background:#1a1a1a;color:rgba(255,255,255,0.7);margin-top:0;display:block;width:100%}
 .footer-grid{
   display:grid;
   grid-template-columns:1.5fr 1fr 1fr;
@@ -206,7 +202,9 @@ footer{background:#1a1a1a;color:rgba(255,255,255,0.7);margin-top:0}
   </a>
 </nav>
 
+<div class="main-block">
 {% block content %}{% endblock %}
+</div>
 
 <footer>
   <div class="footer-grid">
@@ -225,14 +223,12 @@ footer{background:#1a1a1a;color:rgba(255,255,255,0.7);margin-top:0}
         </a>
       </div>
     </div>
-
     <div class="footer-col">
       <p class="footer-col-title">Liens rapides</p>
       <a href="/" class="footer-link">Accueil</a>
       <a href="/catalogue/" class="footer-link">Catalogue</a>
       <a href="/panier/" class="footer-link">Mon Panier</a>
     </div>
-
     <div class="footer-col">
       <p class="footer-col-title">Contactez-nous</p>
       <p class="footer-contact-item">
@@ -249,7 +245,6 @@ footer{background:#1a1a1a;color:rgba(255,255,255,0.7);margin-top:0}
       </p>
     </div>
   </div>
-
   <div class="footer-bottom">
     <p>© 2026 <span>F&M Alta Style</span> — Tous droits réservés</p>
   </div>
