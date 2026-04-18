@@ -11,6 +11,8 @@
 .detail-price{font-size:1.5rem;font-weight:600;color:var(--gold);margin-bottom:1.5rem}
 .detail-desc{font-size:0.85rem;color:var(--gray);line-height:1.8;margin-bottom:2rem;padding-bottom:2rem;border-bottom:1px solid var(--border)}
 .qty-label{font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--gray);margin-bottom:0.75rem}
+.taille-btn{background:none;border:1px solid var(--border);padding:8px 16px;font-family:'Montserrat',sans-serif;font-size:0.75rem;cursor:pointer;transition:all 0.3s;min-width:44px}
+.taille-btn:hover,.taille-btn.selected{background:var(--black);color:var(--white);border-color:var(--black)}
 .qty-control{display:flex;align-items:center;gap:0;margin-bottom:2rem;width:fit-content;border:1px solid var(--border)}
 .qty-btn{background:none;border:none;width:44px;height:44px;font-size:1.2rem;cursor:pointer;transition:background 0.2s;font-family:'Montserrat',sans-serif}
 .qty-btn:hover{background:var(--cream)}
@@ -39,6 +41,12 @@
     <p class="detail-price">{{ produit.prix }} DT</p>
     <p class="detail-desc">{{ produit.description }}</p>
 
+    {% if produit.tailles %}
+    <p class="qty-label">Taille</p>
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:1.5rem" id="taillesWrapper">
+    </div>
+    {% endif %}
+
     <p class="qty-label">Quantité</p>
     <div class="qty-control">
       <button class="qty-btn" onclick="changeQty(-1)">−</button>
@@ -65,6 +73,25 @@
 
 {% block scripts %}
 <script>
+const tailles = "{{ produit.tailles }}";
+if (tailles) {
+  const wrapper = document.getElementById('taillesWrapper');
+  tailles.split(',').forEach(t => {
+    const btn = document.createElement('button');
+    btn.className = 'taille-btn';
+    btn.textContent = t.trim();
+    btn.onclick = () => selectTaille(btn);
+    wrapper.appendChild(btn);
+  });
+}
+
+let selectedTaille = '';
+function selectTaille(btn) {
+  document.querySelectorAll('.taille-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedTaille = btn.textContent.trim();
+}
+
 function changeQty(val) {
   const input = document.getElementById('qty');
   const newVal = parseInt(input.value) + val;
@@ -78,9 +105,9 @@ function addToCartDetail(btn) {
   const qty = parseInt(document.getElementById('qty').value);
 
   let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-  const existing = cart.find(i => i.id === id);
+  const existing = cart.find(i => i.id === id && i.taille === selectedTaille);
   if (existing) existing.qty += qty;
-  else cart.push({id, nom, prix, qty});
+  else cart.push({id, nom, prix, qty, taille: selectedTaille});
   localStorage.setItem('cart', JSON.stringify(cart));
   updateCartCount();
 

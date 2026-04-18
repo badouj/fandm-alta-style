@@ -14,6 +14,7 @@ class Produit(models.Model):
     categorie = models.CharField(max_length=50, choices=CATEGORIES)
     image = models.ImageField(upload_to='produits/', blank=True, null=True)
     disponible = models.BooleanField(default=True)
+    tailles = models.CharField(max_length=200, blank=True, default='', help_text='ex: S,M,L,XL,XXL')
     date_ajout = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -45,6 +46,7 @@ class LigneCommande(models.Model):
     produit = models.ForeignKey(Produit, on_delete=models.CASCADE)
     quantite = models.IntegerField(default=1)
     prix_unitaire = models.DecimalField(max_digits=10, decimal_places=3)
+    taille = models.CharField(max_length=10, blank=True, default='')
 
     def __str__(self):
         return f"{self.produit.nom} x{self.quantite}"
