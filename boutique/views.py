@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from .models import Produit, Commande, LigneCommande
+from .models import Produit, ProduitVariant, Commande, LigneCommande
 import json
 
 def accueil(request):
@@ -11,14 +11,12 @@ def accueil(request):
 def catalogue(request):
     categorie = request.GET.get('cat', 'all')
     sous_categorie = request.GET.get('sous', '')
-
     if categorie == 'all':
         produits = Produit.objects.filter(disponible=True)
     elif sous_categorie:
         produits = Produit.objects.filter(disponible=True, categorie=categorie, sous_categorie=sous_categorie)
     else:
         produits = Produit.objects.filter(disponible=True, categorie=categorie)
-
     return render(request, 'boutique/catalogue.html', {
         'produits': produits,
         'categorie': categorie,
@@ -30,7 +28,22 @@ def panier(request):
 
 def produit_detail(request, pk):
     produit = get_object_or_404(Produit, pk=pk)
-    return render(request, 'boutique/produit_detail.html', {'produit': produit})
+    variants = produit.variants.filter(stock__gt=0)
+    couleurs = list(variants.values_list('couleur', flat=True).distinct())
+    variants_data = {}
+    for v in variants:
+        if v.couleur not in variants_data:
+            variants_data[v.couleur] = []
+        variants_data[v.couleur].append({
+            'id': v.id,
+            'taille': v.taille,
+            'stock': v.stock
+        })
+    return render(request, 'boutique/produit_detail.html', {
+        'produit': produit,
+        'couleurs': couleurs,
+        'variants_data': json.dumps(variants_data),
+    })
 
 def commande(request):
     if request.method == 'POST':
@@ -47,11 +60,22 @@ def commande(request):
         )
         for item in panier_data:
             produit = Produit.objects.get(id=item['id'])
+            variant = None
+            if item.get('variant_id'):
+                try:
+                    variant = ProduitVariant.objects.get(id=item['variant_id'])
+                    if variant.stock >= item['qty']:
+                        variant.stock -= item['qty']
+                        variant.save()
+                except ProduitVariant.DoesNotExist:
+                    pass
             LigneCommande.objects.create(
                 commande=cmd,
                 produit=produit,
+                variant=variant,
                 quantite=item['qty'],
                 prix_unitaire=item['prix'],
+                couleur=item.get('couleur', ''),
                 taille=item.get('taille', '')
             )
         return render(request, 'boutique/success.html', {'commande': cmd})
@@ -92,7 +116,6 @@ def admin_produit_ajouter(request):
             prix=request.POST['prix'],
             categorie=request.POST['categorie'],
             sous_categorie=request.POST.get('sous_categorie', ''),
-            tailles=request.POST.get('tailles', ''),
             image=request.FILES.get('image'),
             disponible='disponible' in request.POST
         )
@@ -108,7 +131,6 @@ def admin_produit_modifier(request, pk):
         produit.prix = request.POST['prix']
         produit.categorie = request.POST['categorie']
         produit.sous_categorie = request.POST.get('sous_categorie', '')
-        produit.tailles = request.POST.get('tailles', '')
         produit.disponible = 'disponible' in request.POST
         if request.FILES.get('image'):
             produit.image = request.FILES['image']
