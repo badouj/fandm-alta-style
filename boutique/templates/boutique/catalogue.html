@@ -174,7 +174,7 @@ function addToCart(btn) {
   else cart.push({id, nom, prix, qty: 1});
   localStorage.setItem('cart', JSON.stringify(cart));
   updateCartCount();
-  alert(nom + ' ajouté au panier !');
+  
 }
 </script>
 {% endblock %}
