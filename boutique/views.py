@@ -10,13 +10,19 @@ def accueil(request):
 
 def catalogue(request):
     categorie = request.GET.get('cat', 'all')
+    sous_categorie = request.GET.get('sous', '')
+
     if categorie == 'all':
         produits = Produit.objects.filter(disponible=True)
+    elif sous_categorie:
+        produits = Produit.objects.filter(disponible=True, categorie=categorie, sous_categorie=sous_categorie)
     else:
         produits = Produit.objects.filter(disponible=True, categorie=categorie)
+
     return render(request, 'boutique/catalogue.html', {
         'produits': produits,
-        'categorie': categorie
+        'categorie': categorie,
+        'sous_categorie': sous_categorie
     })
 
 def panier(request):
@@ -85,6 +91,7 @@ def admin_produit_ajouter(request):
             description=request.POST['description'],
             prix=request.POST['prix'],
             categorie=request.POST['categorie'],
+            sous_categorie=request.POST.get('sous_categorie', ''),
             tailles=request.POST.get('tailles', ''),
             image=request.FILES.get('image'),
             disponible='disponible' in request.POST
@@ -100,6 +107,7 @@ def admin_produit_modifier(request, pk):
         produit.description = request.POST['description']
         produit.prix = request.POST['prix']
         produit.categorie = request.POST['categorie']
+        produit.sous_categorie = request.POST.get('sous_categorie', '')
         produit.tailles = request.POST.get('tailles', '')
         produit.disponible = 'disponible' in request.POST
         if request.FILES.get('image'):

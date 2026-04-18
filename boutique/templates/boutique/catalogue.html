@@ -2,12 +2,15 @@
 {% block content %}
 <style>
 .page-wrapper{display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - 65px)}
-.sidebar{border-right:1px solid var(--border);padding:2rem 0;background:var(--white)}
+.sidebar{border-right:1px solid var(--border);padding:2rem 0;background:var(--white);overflow-y:auto}
 .sidebar-title{font-size:1.1rem;font-weight:600;color:var(--black);padding:0 1.5rem;margin-bottom:1.5rem;letter-spacing:0.5px}
 .sidebar-divider{border:none;border-top:2px solid var(--gold);margin:0 1.5rem 1.5rem;width:40px}
 .sidebar-link{display:block;padding:0.55rem 1.5rem;font-size:0.9rem;text-decoration:none;color:#444;transition:all 0.2s;border-left:3px solid transparent}
 .sidebar-link:hover{color:var(--gold)}
 .sidebar-link.active{color:var(--gold);border-left-color:var(--gold);font-weight:500}
+.sidebar-section{font-size:0.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);padding:1rem 1.5rem 0.25rem;font-weight:600}
+.sidebar-sublink{display:block;padding:0.4rem 1.5rem 0.4rem 2.5rem;font-size:0.82rem;text-decoration:none;color:#888;transition:all 0.2s}
+.sidebar-sublink:hover,.sidebar-sublink.active{color:var(--gold)}
 .main-content{padding:2rem 2.5rem}
 .main-header{margin-bottom:2rem}
 .main-header small{font-size:0.7rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);display:block;margin-bottom:0.4rem}
@@ -30,11 +33,29 @@
   <aside class="sidebar">
     <p class="sidebar-title">Catégories</p>
     <hr class="sidebar-divider">
+
     <a href="/catalogue/" class="sidebar-link {% if categorie == 'all' %}active{% endif %}">Tous les produits</a>
-    <a href="/catalogue/?cat=jebba" class="sidebar-link {% if categorie == 'jebba' %}active{% endif %}">Jebba</a>
-    <a href="/catalogue/?cat=burnous" class="sidebar-link {% if categorie == 'burnous' %}active{% endif %}">Burnous</a>
-    <a href="/catalogue/?cat=kaftan" class="sidebar-link {% if categorie == 'kaftan' %}active{% endif %}">Kaftan</a>
-    <a href="/catalogue/?cat=accessoire" class="sidebar-link {% if categorie == 'accessoire' %}active{% endif %}">Accessoires</a>
+
+    <p class="sidebar-section">Femme</p>
+    <a href="/catalogue/?cat=femme" class="sidebar-link {% if categorie == 'femme' and not sous_categorie %}active{% endif %}">Tous Femme</a>
+    <a href="/catalogue/?cat=femme&sous=jebba_f" class="sidebar-sublink {% if sous_categorie == 'jebba_f' %}active{% endif %}">↳ Jebba</a>
+    <a href="/catalogue/?cat=femme&sous=dengri_f" class="sidebar-sublink {% if sous_categorie == 'dengri_f' %}active{% endif %}">↳ Dengri</a>
+    <a href="/catalogue/?cat=femme&sous=kachabiya_f" class="sidebar-sublink {% if sous_categorie == 'kachabiya_f' %}active{% endif %}">↳ Kachabiya</a>
+    <a href="/catalogue/?cat=femme&sous=cape" class="sidebar-sublink {% if sous_categorie == 'cape' %}active{% endif %}">↳ Cape</a>
+    <a href="/catalogue/?cat=femme&sous=kamis_f" class="sidebar-sublink {% if sous_categorie == 'kamis_f' %}active{% endif %}">↳ Kamis</a>
+
+    <p class="sidebar-section">Homme</p>
+    <a href="/catalogue/?cat=homme" class="sidebar-link {% if categorie == 'homme' and not sous_categorie %}active{% endif %}">Tous Homme</a>
+    <a href="/catalogue/?cat=homme&sous=herga_h" class="sidebar-sublink {% if sous_categorie == 'herga_h' %}active{% endif %}">↳ Herga</a>
+    <a href="/catalogue/?cat=homme&sous=dengri_h" class="sidebar-sublink {% if sous_categorie == 'dengri_h' %}active{% endif %}">↳ Dengri</a>
+    <a href="/catalogue/?cat=homme&sous=burnous" class="sidebar-sublink {% if sous_categorie == 'burnous' %}active{% endif %}">↳ Burnous</a>
+
+    <p class="sidebar-section">Enfants</p>
+    <a href="/catalogue/?cat=enfants" class="sidebar-link {% if categorie == 'enfants' and not sous_categorie %}active{% endif %}">Tous Enfants</a>
+    <a href="/catalogue/?cat=enfants&sous=jebba_e" class="sidebar-sublink {% if sous_categorie == 'jebba_e' %}active{% endif %}">↳ Jebba</a>
+    <a href="/catalogue/?cat=enfants&sous=dengri_e" class="sidebar-sublink {% if sous_categorie == 'dengri_e' %}active{% endif %}">↳ Dengri</a>
+    <a href="/catalogue/?cat=enfants&sous=kachabiya_e" class="sidebar-sublink {% if sous_categorie == 'kachabiya_e' %}active{% endif %}">↳ Kachabiya</a>
+    <a href="/catalogue/?cat=enfants&sous=herga_e" class="sidebar-sublink {% if sous_categorie == 'herga_e' %}active{% endif %}">↳ Herga</a>
   </aside>
 
   <div class="main-content">

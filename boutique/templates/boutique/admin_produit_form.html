@@ -39,13 +39,18 @@
       </div>
       <div class="form-group">
         <label class="form-label">Catégorie *</label>
-        <select name="categorie" class="form-input">
-          <option value="jebba" {% if produit and produit.categorie == 'jebba' %}selected{% endif %}>Jebba</option>
-          <option value="burnous" {% if produit and produit.categorie == 'burnous' %}selected{% endif %}>Burnous</option>
-          <option value="kaftan" {% if produit and produit.categorie == 'kaftan' %}selected{% endif %}>Kaftan</option>
-          <option value="accessoire" {% if produit and produit.categorie == 'accessoire' %}selected{% endif %}>Accessoire</option>
+        <select name="categorie" id="categorie" class="form-input" onchange="updateSousCategories()">
+          <option value="femme" {% if produit and produit.categorie == 'femme' %}selected{% endif %}>Femme</option>
+          <option value="homme" {% if produit and produit.categorie == 'homme' %}selected{% endif %}>Homme</option>
+          <option value="enfants" {% if produit and produit.categorie == 'enfants' %}selected{% endif %}>Enfants</option>
         </select>
       </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Sous-catégorie</label>
+      <select name="sous_categorie" id="sous_categorie" class="form-input">
+      </select>
     </div>
 
     <div class="form-group">
@@ -87,4 +92,49 @@
     </div>
   </form>
 </div>
+
+{% block scripts %}
+<script>
+const sousCategories = {
+  femme: [
+    {value: 'jebba_f', label: 'Jebba'},
+    {value: 'dengri_f', label: 'Dengri'},
+    {value: 'kachabiya_f', label: 'Kachabiya'},
+    {value: 'cape', label: 'Cape'},
+    {value: 'kamis_f', label: 'Kamis'},
+    {value: 'autre', label: 'Autre'},
+  ],
+  homme: [
+    {value: 'herga_h', label: 'Herga'},
+    {value: 'dengri_h', label: 'Dengri'},
+    {value: 'burnous', label: 'Burnous'},
+    {value: 'autre', label: 'Autre'},
+  ],
+  enfants: [
+    {value: 'jebba_e', label: 'Jebba'},
+    {value: 'dengri_e', label: 'Dengri'},
+    {value: 'kachabiya_e', label: 'Kachabiya'},
+    {value: 'herga_e', label: 'Herga'},
+    {value: 'autre', label: 'Autre'},
+  ]
+};
+
+const currentSousCategorie = "{% if produit %}{{ produit.sous_categorie }}{% endif %}";
+
+function updateSousCategories() {
+  const cat = document.getElementById('categorie').value;
+  const select = document.getElementById('sous_categorie');
+  select.innerHTML = '';
+  (sousCategories[cat] || []).forEach(item => {
+    const opt = document.createElement('option');
+    opt.value = item.value;
+    opt.textContent = item.label;
+    if (item.value === currentSousCategorie) opt.selected = true;
+    select.appendChild(opt);
+  });
+}
+
+updateSousCategories();
+</script>
+{% endblock %}
 {% endblock %}
