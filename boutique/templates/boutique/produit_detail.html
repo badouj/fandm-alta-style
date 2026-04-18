@@ -9,8 +9,11 @@
 .detail-cat{font-size:0.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:0.75rem}
 .detail-name{font-family:'Cormorant Garamond',serif;font-size:2.5rem;font-weight:600;line-height:1.2;margin-bottom:1rem}
 .detail-price{font-size:1.5rem;font-weight:600;color:var(--gold);margin-bottom:1.5rem}
-.detail-desc{font-size:0.85rem;color:var(--gray);line-height:1.8;margin-bottom:2rem;padding-bottom:2rem;border-bottom:1px solid var(--border)}
-.qty-label{font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--gray);margin-bottom:0.75rem}
+.detail-desc{font-size:0.85rem;color:var(--gray);line-height:1.8;margin-bottom:1rem}
+.detail-info-row{display:flex;gap:0.5rem;align-items:center;font-size:0.85rem;margin-bottom:0.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+.detail-info-label{font-weight:600;color:var(--black);min-width:80px;font-size:0.75rem;letter-spacing:1px;text-transform:uppercase}
+.detail-info-value{color:var(--gray)}
+.qty-label{font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--gray);margin-bottom:0.75rem;margin-top:1.5rem}
 .taille-btn{background:none;border:1px solid var(--border);padding:8px 16px;font-family:'Montserrat',sans-serif;font-size:0.75rem;cursor:pointer;transition:all 0.3s;min-width:44px}
 .taille-btn:hover,.taille-btn.selected{background:var(--black);color:var(--white);border-color:var(--black)}
 .taille-error{color:#e53e3e;font-size:0.75rem;margin-bottom:1rem;display:none}
@@ -42,8 +45,15 @@
     <p class="detail-price">{{ produit.prix }} DT</p>
     <p class="detail-desc">{{ produit.description }}</p>
 
+    <div class="detail-info-row">
+      {% if produit.tailles %}
+      <span class="detail-info-label">Taille :</span>
+      <span class="detail-info-value">{{ produit.tailles }}</span>
+      {% endif %}
+    </div>
+
     {% if produit.tailles %}
-    <p class="qty-label">Taille</p>
+    <p class="qty-label">Choisir une taille</p>
     <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-bottom:0.75rem" id="taillesWrapper"></div>
     <p class="taille-error" id="tailleError">⚠ Veuillez choisir une taille</p>
     {% endif %}
