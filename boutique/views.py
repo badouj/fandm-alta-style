@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import JsonResponse
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from .models import Produit, Commande, LigneCommande
 import json
 
@@ -21,15 +22,16 @@ def catalogue(request):
 def panier(request):
     return render(request, 'boutique/panier.html')
 
+def produit_detail(request, pk):
+    produit = get_object_or_404(Produit, pk=pk)
+    return render(request, 'boutique/produit_detail.html', {'produit': produit})
+
 def commande(request):
     if request.method == 'POST':
         panier_data = json.loads(request.POST.get('panier', '[]'))
-        
         if not panier_data:
             return redirect('panier')
-
         total = sum(item['prix'] * item['qty'] for item in panier_data)
-        
         cmd = Commande.objects.create(
             nom_client=request.POST['nom'],
             telephone=request.POST['telephone'],
@@ -37,22 +39,17 @@ def commande(request):
             notes=request.POST.get('notes', ''),
             total=total
         )
-
         for item in panier_data:
             produit = Produit.objects.get(id=item['id'])
             LigneCommande.objects.create(
                 commande=cmd,
                 produit=produit,
                 quantite=item['qty'],
-                prix_unitaire=item['prix']
+                prix_unitaire=item['prix'],
+                taille=item.get('taille', '')
             )
-
         return render(request, 'boutique/success.html', {'commande': cmd})
-    
     return render(request, 'boutique/commande.html')
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
 
 def admin_login(request):
     error = None
@@ -88,6 +85,7 @@ def admin_produit_ajouter(request):
             description=request.POST['description'],
             prix=request.POST['prix'],
             categorie=request.POST['categorie'],
+            tailles=request.POST.get('tailles', ''),
             image=request.FILES.get('image'),
             disponible='disponible' in request.POST
         )
@@ -102,6 +100,7 @@ def admin_produit_modifier(request, pk):
         produit.description = request.POST['description']
         produit.prix = request.POST['prix']
         produit.categorie = request.POST['categorie']
+        produit.tailles = request.POST.get('tailles', '')
         produit.disponible = 'disponible' in request.POST
         if request.FILES.get('image'):
             produit.image = request.FILES['image']
@@ -128,6 +127,3 @@ def admin_commande_detail(request, pk):
         commande.save()
         return redirect('admin_commande_detail', pk=pk)
     return render(request, 'boutique/admin_commande_detail.html', {'commande': commande})
-def produit_detail(request, pk):
-    produit = get_object_or_404(Produit, pk=pk)
-    return render(request, 'boutique/produit_detail.html', {'produit': produit})
