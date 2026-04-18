@@ -2,114 +2,27 @@
 {% block content %}
 <style>
 .page-wrapper{display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - 65px)}
-
-/* SIDEBAR */
 .sidebar{border-right:1px solid var(--border);padding:2rem 0;background:var(--white)}
-.sidebar-title{
-  font-size:1.1rem;
-  font-weight:600;
-  color:var(--black);
-  padding:0 1.5rem;
-  margin-bottom:1.5rem;
-  letter-spacing:0.5px;
-}
+.sidebar-title{font-size:1.1rem;font-weight:600;color:var(--black);padding:0 1.5rem;margin-bottom:1.5rem;letter-spacing:0.5px}
 .sidebar-divider{border:none;border-top:2px solid var(--gold);margin:0 1.5rem 1.5rem;width:40px}
-.sidebar-link{
-  display:block;
-  padding:0.55rem 1.5rem;
-  font-size:0.9rem;
-  text-decoration:none;
-  color:#444;
-  transition:all 0.2s;
-  border-left:3px solid transparent;
-}
+.sidebar-link{display:block;padding:0.55rem 1.5rem;font-size:0.9rem;text-decoration:none;color:#444;transition:all 0.2s;border-left:3px solid transparent}
 .sidebar-link:hover{color:var(--gold)}
 .sidebar-link.active{color:var(--gold);border-left-color:var(--gold);font-weight:500}
-
-/* HEADER */
 .main-content{padding:2rem 2.5rem}
 .main-header{margin-bottom:2rem}
-.main-header small{
-  font-size:0.7rem;
-  letter-spacing:3px;
-  text-transform:uppercase;
-  color:var(--gold);
-  display:block;
-  margin-bottom:0.4rem;
-}
-.main-header h2{
-  font-family:'Cormorant Garamond',serif;
-  font-size:2.8rem;
-  font-weight:700;
-  color:var(--black);
-  line-height:1;
-}
-
-/* GRID */
-.products-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(230px,1fr));
-  gap:1.5rem;
-}
-.product-card{
-  background:var(--white);
-  border:1px solid var(--border);
-  transition:box-shadow 0.3s,transform 0.3s;
-}
-.product-card:hover{
-  box-shadow:0 6px 24px rgba(0,0,0,0.09);
-  transform:translateY(-3px);
-}
-.prod-img{
-  width:100%;
-  aspect-ratio:4/3;
-  background:#f5f5f5;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:4rem;
-  overflow:hidden;
-}
+.main-header small{font-size:0.7rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);display:block;margin-bottom:0.4rem}
+.main-header h2{font-family:'Cormorant Garamond',serif;font-size:2.8rem;font-weight:700;color:var(--black);line-height:1}
+.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:1.5rem}
+.product-card{background:var(--white);border:1px solid var(--border);transition:box-shadow 0.3s,transform 0.3s;cursor:pointer}
+.product-card:hover{box-shadow:0 6px 24px rgba(0,0,0,0.09);transform:translateY(-3px)}
+.prod-img{width:100%;aspect-ratio:4/3;background:#f5f5f5;display:flex;align-items:center;justify-content:center;font-size:4rem;overflow:hidden}
 .prod-img img{width:100%;height:100%;object-fit:cover}
 .prod-body{padding:1rem 1rem 0}
-.prod-name{
-  font-size:1rem;
-  font-weight:600;
-  margin-bottom:0.3rem;
-  color:var(--black);
-}
-.prod-desc{
-  font-size:0.75rem;
-  color:#888;
-  line-height:1.6;
-}
-.prod-footer{
-  padding:1rem;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  margin-top:0.75rem;
-}
-.prod-price{
-  background:var(--gold);
-  color:var(--white);
-  padding:7px 14px;
-  font-size:0.85rem;
-  font-weight:600;
-  letter-spacing:0.5px;
-}
-.add-btn{
-  background:var(--black);
-  color:var(--white);
-  border:none;
-  padding:8px 14px;
-  font-size:0.7rem;
-  letter-spacing:1px;
-  text-transform:uppercase;
-  cursor:pointer;
-  font-family:'Montserrat',sans-serif;
-  transition:background 0.3s;
-}
+.prod-name{font-size:1rem;font-weight:600;margin-bottom:0.3rem;color:var(--black)}
+.prod-desc{font-size:0.75rem;color:#888;line-height:1.6}
+.prod-footer{padding:1rem;display:flex;align-items:center;justify-content:space-between;margin-top:0.75rem}
+.prod-price{background:var(--gold);color:var(--white);padding:7px 14px;font-size:0.85rem;font-weight:600;letter-spacing:0.5px}
+.add-btn{background:var(--black);color:var(--white);border:none;padding:8px 14px;font-size:0.7rem;letter-spacing:1px;text-transform:uppercase;cursor:pointer;font-family:'Montserrat',sans-serif;transition:background 0.3s}
 .add-btn:hover{background:var(--gold)}
 </style>
 
@@ -131,7 +44,7 @@
     </div>
     <div class="products-grid">
       {% for produit in produits %}
-      <div class="product-card" onclick="window.location='/produit/{{ produit.id }}/'" style="cursor:pointer">
+      <div class="product-card" onclick="window.location='/produit/{{ produit.id }}/'">
         <div class="prod-img">
           {% if produit.image %}
           <img src="{{ produit.image.url }}" alt="{{ produit.nom }}">
@@ -143,11 +56,7 @@
         </div>
         <div class="prod-footer">
           <span class="prod-price">{{ produit.prix }} DT</span>
-          <button class="add-btn"
-            data-id="{{ produit.id }}"
-            data-nom="{{ produit.nom|escapejs }}"
-            data-prix="{{ produit.prix }}"
-            onclick="addToCart(this)">
+          <button class="add-btn" onclick="event.stopPropagation();window.location='/produit/{{ produit.id }}/'">
             + Panier
           </button>
         </div>
@@ -163,18 +72,5 @@
 {% endblock %}
 
 {% block scripts %}
-<script>
-function addToCart(btn) {
-  const id = parseInt(btn.dataset.id);
-  const nom = btn.dataset.nom;
-  const prix = parseFloat(btn.dataset.prix);
-  let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-  const existing = cart.find(i => i.id === id);
-  if (existing) existing.qty++;
-  else cart.push({id, nom, prix, qty: 1});
-  localStorage.setItem('cart', JSON.stringify(cart));
-  updateCartCount();
-  
-}
-</script>
+<script></script>
 {% endblock %}
