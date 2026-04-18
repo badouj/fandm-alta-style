@@ -17,170 +17,36 @@
   --border:#e0e0e0;
 }
 body{font-family:'Montserrat',sans-serif;background:var(--white);color:var(--black);display:flex;flex-direction:column;min-height:100vh}
-nav{
-  background:var(--dark);
-  padding:0 2.5rem;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  height:65px;
-  position:sticky;
-  top:0;
-  z-index:100;
-}
-.logo{
-  font-family:'Cormorant Garamond',serif;
-  font-size:1.5rem;
-  font-weight:700;
-  letter-spacing:2px;
-  text-decoration:none;
-  color:var(--white);
-}
+nav{background:var(--dark);padding:0 2.5rem;display:flex;align-items:center;justify-content:space-between;height:65px;position:sticky;top:0;z-index:100}
+.logo{font-family:'Cormorant Garamond',serif;font-size:1.5rem;font-weight:700;letter-spacing:2px;text-decoration:none;color:var(--white)}
 .logo span{color:var(--gold)}
 .nav-links{display:flex;gap:2.5rem;list-style:none}
-.nav-links a{
-  text-decoration:none;
-  font-size:0.8rem;
-  letter-spacing:2px;
-  text-transform:uppercase;
-  color:rgba(255,255,255,0.8);
-  font-weight:400;
-  transition:color 0.3s;
-}
+.nav-links a{text-decoration:none;font-size:0.8rem;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.8);font-weight:400;transition:color 0.3s}
 .nav-links a:hover{color:var(--gold)}
-.cart-icon-btn{
-  position:relative;
-  background:none;
-  border:none;
-  cursor:pointer;
-  text-decoration:none;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  width:44px;
-  height:44px;
-}
-.cart-icon-btn svg{
-  width:26px;
-  height:26px;
-  stroke:var(--white);
-  fill:none;
-  stroke-width:1.8;
-  transition:stroke 0.3s;
-}
+.cart-icon-btn{position:relative;background:none;border:none;cursor:pointer;text-decoration:none;display:flex;align-items:center;justify-content:center;width:44px;height:44px}
+.cart-icon-btn svg{width:26px;height:26px;stroke:var(--white);fill:none;stroke-width:1.8;transition:stroke 0.3s}
 .cart-icon-btn:hover svg{stroke:var(--gold)}
-.cart-badge{
-  position:absolute;
-  top:4px;
-  right:4px;
-  background:var(--gold);
-  color:var(--white);
-  border-radius:50%;
-  width:18px;
-  height:18px;
-  font-size:0.6rem;
-  font-weight:600;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-family:'Montserrat',sans-serif;
-}
-.btn-primary{
-  background:var(--black);
-  color:var(--white);
-  border:none;
-  padding:12px 28px;
-  font-family:'Montserrat',sans-serif;
-  font-size:0.72rem;
-  letter-spacing:2px;
-  text-transform:uppercase;
-  cursor:pointer;
-  text-decoration:none;
-  display:inline-block;
-  transition:background 0.3s;
-}
+.cart-badge{position:absolute;top:4px;right:4px;background:var(--gold);color:var(--white);border-radius:50%;width:18px;height:18px;font-size:0.6rem;font-weight:600;display:flex;align-items:center;justify-content:center;font-family:'Montserrat',sans-serif}
+.btn-primary{background:var(--black);color:var(--white);border:none;padding:12px 28px;font-family:'Montserrat',sans-serif;font-size:0.72rem;letter-spacing:2px;text-transform:uppercase;cursor:pointer;text-decoration:none;display:inline-block;transition:background 0.3s}
 .btn-primary:hover{background:var(--gold)}
-.btn-outline{
-  background:none;
-  color:var(--black);
-  border:1.5px solid var(--black);
-  padding:12px 28px;
-  font-family:'Montserrat',sans-serif;
-  font-size:0.72rem;
-  letter-spacing:2px;
-  text-transform:uppercase;
-  cursor:pointer;
-  text-decoration:none;
-  display:inline-block;
-  transition:all 0.3s;
-}
+.btn-outline{background:none;color:var(--black);border:1.5px solid var(--black);padding:12px 28px;font-family:'Montserrat',sans-serif;font-size:0.72rem;letter-spacing:2px;text-transform:uppercase;cursor:pointer;text-decoration:none;display:inline-block;transition:all 0.3s}
 .btn-outline:hover{border-color:var(--gold);color:var(--gold)}
 .main-block{flex:1}
 footer{background:#1a1a1a;color:rgba(255,255,255,0.7);margin-top:0;display:block;width:100%}
-.footer-grid{
-  display:grid;
-  grid-template-columns:1.5fr 1fr 1fr;
-  gap:3rem;
-  padding:3rem 2.5rem;
-  max-width:1200px;
-  margin:0 auto;
-}
-.footer-logo{
-  font-family:'Cormorant Garamond',serif;
-  font-size:1.4rem;
-  font-weight:700;
-  color:var(--white);
-  margin-bottom:0.75rem;
-  letter-spacing:2px;
-}
+.footer-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:3rem;padding:3rem 2.5rem;max-width:1200px;margin:0 auto}
+.footer-logo{font-family:'Cormorant Garamond',serif;font-size:1.4rem;font-weight:700;color:var(--white);margin-bottom:0.75rem;letter-spacing:2px}
 .footer-logo span{color:var(--gold)}
 .footer-logo-sub{font-size:0.7rem;font-weight:300;letter-spacing:4px}
 .footer-slogan{font-size:0.8rem;line-height:1.7;color:rgba(255,255,255,0.5);margin-bottom:1.25rem}
 .footer-socials{display:flex;gap:0.75rem}
-.social-link{
-  width:34px;height:34px;
-  border:1px solid rgba(255,255,255,0.2);
-  border-radius:50%;
-  display:flex;align-items:center;justify-content:center;
-  color:rgba(255,255,255,0.6);
-  text-decoration:none;
-  transition:all 0.3s;
-}
+.social-link{width:34px;height:34px;border:1px solid rgba(255,255,255,0.2);border-radius:50%;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.6);text-decoration:none;transition:all 0.3s}
 .social-link svg{width:14px;height:14px}
 .social-link:hover{border-color:var(--gold);color:var(--gold)}
-.footer-col-title{
-  font-size:0.75rem;
-  letter-spacing:3px;
-  text-transform:uppercase;
-  color:var(--gold);
-  margin-bottom:1.25rem;
-  font-weight:500;
-}
-.footer-link{
-  display:block;
-  text-decoration:none;
-  color:rgba(255,255,255,0.6);
-  font-size:0.85rem;
-  margin-bottom:0.6rem;
-  transition:color 0.3s;
-}
+.footer-col-title{font-size:0.75rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:1.25rem;font-weight:500}
+.footer-link{display:block;text-decoration:none;color:rgba(255,255,255,0.6);font-size:0.85rem;margin-bottom:0.6rem;transition:color 0.3s}
 .footer-link:hover{color:var(--gold)}
-.footer-contact-item{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  font-size:0.82rem;
-  color:rgba(255,255,255,0.6);
-  margin-bottom:0.75rem;
-}
-.footer-bottom{
-  border-top:1px solid rgba(255,255,255,0.1);
-  text-align:center;
-  padding:1.25rem;
-  font-size:0.7rem;
-  letter-spacing:1px;
-  color:rgba(255,255,255,0.3);
-}
+.footer-contact-item{display:flex;align-items:center;gap:8px;font-size:0.82rem;color:rgba(255,255,255,0.6);margin-bottom:0.75rem}
+.footer-bottom{border-top:1px solid rgba(255,255,255,0.1);text-align:center;padding:1.25rem;font-size:0.7rem;letter-spacing:1px;color:rgba(255,255,255,0.3)}
 .footer-bottom span{color:var(--gold)}
 </style>
 </head>
@@ -190,7 +56,9 @@ footer{background:#1a1a1a;color:rgba(255,255,255,0.7);margin-top:0;display:block
   <a class="logo" href="/">F<span>&</span>M <span style="font-size:0.75rem;font-weight:300;letter-spacing:4px">ALTA STYLE</span></a>
   <ul class="nav-links">
     <li><a href="/">Accueil</a></li>
-    <li><a href="/catalogue/">Catalogue</a></li>
+    <li><a href="/catalogue/?cat=femme">Femme</a></li>
+    <li><a href="/catalogue/?cat=homme">Homme</a></li>
+    <li><a href="/catalogue/?cat=enfants">Enfants</a></li>
   </ul>
   <a href="/panier/" class="cart-icon-btn">
     <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -226,7 +94,9 @@ footer{background:#1a1a1a;color:rgba(255,255,255,0.7);margin-top:0;display:block
     <div class="footer-col">
       <p class="footer-col-title">Liens rapides</p>
       <a href="/" class="footer-link">Accueil</a>
-      <a href="/catalogue/" class="footer-link">Catalogue</a>
+      <a href="/catalogue/?cat=femme" class="footer-link">Femme</a>
+      <a href="/catalogue/?cat=homme" class="footer-link">Homme</a>
+      <a href="/catalogue/?cat=enfants" class="footer-link">Enfants</a>
       <a href="/panier/" class="footer-link">Mon Panier</a>
     </div>
     <div class="footer-col">
