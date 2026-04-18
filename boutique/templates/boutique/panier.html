@@ -37,7 +37,7 @@ function renderPanier() {
         <div class="panier-item">
           <div>
             <p class="item-name">${item.nom}</p>
-            <p style="font-size:0.7rem;color:var(--gray)">Quantité: ${item.qty}</p>
+           <p style="font-size:0.7rem;color:var(--gray)">Quantité: ${item.qty} ${item.taille ? '· Taille: <strong>' + item.taille + '</strong>' : ''}</p>
           </div>
           <p class="item-price">${(item.prix * item.qty).toFixed(3)} DT</p>
           <button class="remove-btn" onclick="removeItem(${idx})">✕</button>
