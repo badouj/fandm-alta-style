@@ -6,7 +6,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-vo9y=4_-y%9q_0y!!l7%tq&$*bya29g#j+rj=^l6vye!yb15^z')
 
-DEBUG = False
+# DEBUG حسب البيئة
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = ['fmaltastyle.pythonanywhere.com', '127.0.0.1', 'localhost']
 
@@ -77,7 +78,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesעעוhoiseMiddleware'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
@@ -85,12 +86,14 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # ============ SÉCURITÉ ============
-SESSION_COOKIE_SECURE = True
+IS_PRODUCTION = not DEBUG
+
+SESSION_COOKIE_SECURE = IS_PRODUCTION
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = 'Lax'
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
-CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = IS_PRODUCTION
 CSRF_COOKIE_HTTPONLY = True
 CSRF_COOKIE_SAMESITE = 'Lax'
 CSRF_TRUSTED_ORIGINS = ['https://fmaltastyle.pythonanywhere.com']
@@ -99,14 +102,12 @@ SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
 
-SECURE_HSTS_SECONDS = 31536000
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-SECURE_HSTS_PRELOAD = True
-SECURE_SSL_REDIRECT = True
+SECURE_HSTS_SECONDS = 31536000 if IS_PRODUCTION else 0
+SECURE_HSTS_INCLUDE_SUBDOMAINS = IS_PRODUCTION
+SECURE_HSTS_PRELOAD = IS_PRODUCTION
+SECURE_SSL_REDIRECT = IS_PRODUCTION
 
-# Login redirect
 LOGIN_URL = '/mon-admin/login/'
 LOGIN_REDIRECT_URL = '/mon-admin/'
 
-# Session timeout — 2 ساعات
 SESSION_COOKIE_AGE = 7200
