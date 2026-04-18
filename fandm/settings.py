@@ -6,8 +6,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-vo9y=4_-y%9q_0y!!l7%tq&$*bya29g#j+rj=^l6vye!yb15^z')
 
-IS_PYTHONANYWHERE = 'fmaltastyle.pythonanywhere.com' in os.environ.get('HTTP_HOST', '') or \
-                    os.path.exists('/home/fmaltastyle')
+IS_PYTHONANYWHERE = os.path.exists('/home/fmaltastyle')
 
 DEBUG = not IS_PYTHONANYWHERE
 
@@ -102,10 +101,10 @@ SECURE_BROWSER_XSS_FILTER = True
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = 'DENY'
 
-SECURE_HSTS_SECONDS = 31536000 if IS_PYTHONANYWHERE else 0
-SECURE_HSTS_INCLUDE_SUBDOMAINS = IS_PYTHONANYWHERE
-SECURE_HSTS_PRELOAD = IS_PYTHONANYWHERE
-SECURE_SSL_REDIRECT = IS_PYTHONANYWHERE
+SECURE_HSTS_SECONDS = 0
+SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+SECURE_HSTS_PRELOAD = False
+SECURE_SSL_REDIRECT = False
 
 LOGIN_URL = '/mon-admin/login/'
 LOGIN_REDIRECT_URL = '/mon-admin/'
