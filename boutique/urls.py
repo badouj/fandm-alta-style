@@ -21,4 +21,5 @@ urlpatterns = [
     path('mon-admin/produit/modifier/<int:pk>/', views.admin_produit_modifier, name='admin_produit_modifier'),
     path('mon-admin/produit/supprimer/<int:pk>/', views.admin_produit_supprimer, name='admin_produit_supprimer'),
     path('mon-admin/commande/<int:pk>/', views.admin_commande_detail, name='admin_commande_detail'),
+    path('produit/<int:pk>/', views.produit_detail, name='produit_detail'),
 ]

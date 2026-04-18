@@ -128,3 +128,6 @@ def admin_commande_detail(request, pk):
         commande.save()
         return redirect('admin_commande_detail', pk=pk)
     return render(request, 'boutique/admin_commande_detail.html', {'commande': commande})
+def produit_detail(request, pk):
+    produit = get_object_or_404(Produit, pk=pk)
+    return render(request, 'boutique/produit_detail.html', {'produit': produit})

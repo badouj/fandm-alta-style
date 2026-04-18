@@ -131,7 +131,7 @@
     </div>
     <div class="products-grid">
       {% for produit in produits %}
-      <div class="product-card">
+      <div class="product-card" onclick="window.location='/produit/{{ produit.id }}/'" style="cursor:pointer">
         <div class="prod-img">
           {% if produit.image %}
           <img src="{{ produit.image.url }}" alt="{{ produit.nom }}">
