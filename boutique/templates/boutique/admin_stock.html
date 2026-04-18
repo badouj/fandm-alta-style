@@ -1,0 +1,97 @@
+{% extends 'boutique/base.html' %}
+{% block content %}
+<style>
+.stock-wrapper{max-width:1200px;margin:0 auto;padding:2.5rem 2rem}
+.stock-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;padding-bottom:1rem;border-bottom:2px solid var(--gold)}
+.stock-header h1{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:700}
+.stock-header h1 span{color:var(--gold)}
+.produit-block{background:var(--white);border:1px solid var(--border);margin-bottom:2rem}
+.produit-header{display:flex;justify-content:space-between;align-items:center;padding:1rem 1.5rem;background:var(--cream);border-bottom:1px solid var(--border)}
+.produit-header h3{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:600}
+.produit-header small{font-size:0.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--gold)}
+.variants-table{width:100%;border-collapse:collapse}
+.variants-table th{font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--gray);padding:0.75rem 1.5rem;text-align:left;border-bottom:1px solid var(--border)}
+.variants-table td{padding:0.75rem 1.5rem;font-size:0.85rem;border-bottom:1px solid var(--border)}
+.variants-table tr:last-child td{border-bottom:none}
+.stock-badge{display:inline-block;padding:3px 10px;font-size:0.7rem;font-weight:600}
+.stock-ok{background:#d4edda;color:#155724}
+.stock-low{background:#fff3cd;color:#856404}
+.stock-zero{background:#f8d7da;color:#721c24}
+.stock-input{width:70px;border:1px solid var(--border);padding:6px 10px;font-family:'Montserrat',sans-serif;font-size:0.85rem;outline:none;text-align:center}
+.stock-input:focus{border-color:var(--gold)}
+.btn-save{background:var(--black);color:var(--white);border:none;padding:6px 14px;font-family:'Montserrat',sans-serif;font-size:0.65rem;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:background 0.3s}
+.btn-save:hover{background:var(--gold)}
+.btn-del{background:none;border:1px solid #e53e3e;color:#e53e3e;padding:6px 14px;font-family:'Montserrat',sans-serif;font-size:0.65rem;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all 0.3s}
+.btn-del:hover{background:#e53e3e;color:var(--white)}
+.btn-add{background:none;border:1px solid var(--gold);color:var(--gold);padding:8px 16px;font-family:'Montserrat',sans-serif;font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;cursor:pointer;text-decoration:none;transition:all 0.3s;display:inline-block}
+.btn-add:hover{background:var(--gold);color:var(--white)}
+.no-variants{padding:1.5rem;text-align:center;color:var(--gray);font-size:0.85rem}
+</style>
+
+<div class="stock-wrapper">
+  <div class="stock-header">
+    <h1>Gestion du <span>Stock</span></h1>
+    <a href="/mon-admin/" class="btn-outline">← Retour</a>
+  </div>
+
+  {% for produit in produits %}
+  <div class="produit-block">
+    <div class="produit-header">
+      <div>
+        <h3>{{ produit.nom }}</h3>
+        <small>{{ produit.get_categorie_display }} — {{ produit.get_sous_categorie_display }}</small>
+      </div>
+      <a href="/mon-admin/stock/ajouter/{{ produit.pk }}/" class="btn-add">+ Ajouter Variant</a>
+    </div>
+
+    {% if produit.variants.all %}
+    <table class="variants-table">
+      <thead>
+        <tr>
+          <th>Couleur</th>
+          <th>Taille</th>
+          <th>Stock</th>
+          <th>Statut</th>
+          <th>Modifier</th>
+          <th>Supprimer</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for variant in produit.variants.all %}
+        <tr>
+          <td><strong>{{ variant.couleur }}</strong></td>
+          <td>{{ variant.taille }}</td>
+          <td>
+            <form method="POST" action="/mon-admin/stock/update/{{ variant.pk }}/" style="display:flex;gap:0.5rem;align-items:center">
+              {% csrf_token %}
+              <input type="number" name="stock" value="{{ variant.stock }}" min="0" class="stock-input">
+              <button type="submit" class="btn-save">Save</button>
+            </form>
+          </td>
+          <td>
+            {% if variant.stock == 0 %}
+            <span class="stock-badge stock-zero">Épuisé</span>
+            {% elif variant.stock <= 3 %}
+            <span class="stock-badge stock-low">Stock faible ({{ variant.stock }})</span>
+            {% else %}
+            <span class="stock-badge stock-ok">En stock ({{ variant.stock }})</span>
+            {% endif %}
+          </td>
+          <td></td>
+          <td>
+            <form method="POST" action="/mon-admin/stock/supprimer/{{ variant.pk }}/">
+              {% csrf_token %}
+              <button type="submit" class="btn-del" onclick="return confirm('Supprimer ce variant?')">Supprimer</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="no-variants">Aucun variant — <a href="/mon-admin/stock/ajouter/{{ produit.pk }}/" style="color:var(--gold)">Ajouter un variant</a></p>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

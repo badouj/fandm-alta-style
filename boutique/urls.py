@@ -22,4 +22,7 @@ urlpatterns = [
     path('mon-admin/produit/supprimer/<int:pk>/', views.admin_produit_supprimer, name='admin_produit_supprimer'),
     path('mon-admin/commande/<int:pk>/', views.admin_commande_detail, name='admin_commande_detail'),
     path('produit/<int:pk>/', views.produit_detail, name='produit_detail'),
+    path('mon-admin/stock/', views.admin_stock, name='admin_stock'),
+path('mon-admin/stock/ajouter/<int:produit_pk>/', views.admin_variant_ajouter, name='admin_variant_ajouter'),
+path('mon-admin/stock/supprimer/<int:pk>/', views.admin_variant_supprimer, name='admin_variant_supprimer'),
 ]
