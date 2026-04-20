@@ -41,26 +41,23 @@
         <h3>{{ produit.nom }}</h3>
         <small>{{ produit.get_categorie_display }} — {{ produit.get_sous_categorie_display }}</small>
       </div>
-      <a href="/mon-admin/stock/ajouter/{{ produit.pk }}/" class="btn-add">+ Ajouter Variant</a>
+      <a href="/mon-admin/stock/ajouter/{{ produit.pk }}/" class="btn-add">+ Ajouter Taille</a>
     </div>
 
     {% if produit.variants.all %}
     <table class="variants-table">
       <thead>
         <tr>
-          <th>Couleur</th>
           <th>Taille</th>
           <th>Stock</th>
           <th>Statut</th>
-          <th>Modifier</th>
           <th>Supprimer</th>
         </tr>
       </thead>
       <tbody>
         {% for variant in produit.variants.all %}
         <tr>
-          <td><strong>{{ variant.couleur }}</strong></td>
-          <td>{{ variant.taille }}</td>
+          <td><strong>{{ variant.taille }}</strong></td>
           <td>
             <form method="POST" action="/mon-admin/stock/update/{{ variant.pk }}/" style="display:flex;gap:0.5rem;align-items:center">
               {% csrf_token %}
@@ -72,16 +69,15 @@
             {% if variant.stock == 0 %}
             <span class="stock-badge stock-zero">Épuisé</span>
             {% elif variant.stock <= 3 %}
-            <span class="stock-badge stock-low">Stock faible ({{ variant.stock }})</span>
+            <span class="stock-badge stock-low">Faible ({{ variant.stock }})</span>
             {% else %}
             <span class="stock-badge stock-ok">En stock ({{ variant.stock }})</span>
             {% endif %}
           </td>
-          <td></td>
           <td>
             <form method="POST" action="/mon-admin/stock/supprimer/{{ variant.pk }}/">
               {% csrf_token %}
-              <button type="submit" class="btn-del" onclick="return confirm('Supprimer ce variant?')">Supprimer</button>
+              <button type="submit" class="btn-del" onclick="return confirm('Supprimer?')">Supprimer</button>
             </form>
           </td>
         </tr>
@@ -89,7 +85,7 @@
       </tbody>
     </table>
     {% else %}
-    <p class="no-variants">Aucun variant — <a href="/mon-admin/stock/ajouter/{{ produit.pk }}/" style="color:var(--gold)">Ajouter un variant</a></p>
+    <p class="no-variants">Aucune taille — <a href="/mon-admin/stock/ajouter/{{ produit.pk }}/" style="color:var(--gold)">Ajouter une taille</a></p>
     {% endif %}
   </div>
   {% endfor %}

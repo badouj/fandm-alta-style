@@ -30,23 +30,18 @@ def panier(request):
 def produit_detail(request, pk):
     produit = get_object_or_404(Produit, pk=pk)
     variants = produit.variants.filter(stock__gt=0)
-    couleurs = list(variants.values_list('couleur', flat=True).distinct())
-    couleurs_json = json.dumps(couleurs)
-    variants_data = {}
+    variants_data = []
     for v in variants:
-        if v.couleur not in variants_data:
-            variants_data[v.couleur] = []
-        variants_data[v.couleur].append({
+        variants_data.append({
             'id': v.id,
             'taille': v.taille,
             'stock': v.stock
         })
-    variants_data_json = json.dumps(variants_data)
+    variants_json = json.dumps(variants_data)
     return render(request, 'boutique/produit_detail.html', {
         'produit': produit,
-        'couleurs': couleurs,
-        'couleurs_json': couleurs_json,
-        'variants_data': variants_data_json,
+        'variants': variants,
+        'variants_json': variants_json,
     })
 
 def commande(request):
@@ -79,7 +74,6 @@ def commande(request):
                 variant=variant,
                 quantite=item['qty'],
                 prix_unitaire=item['prix'],
-                couleur=item.get('couleur', ''),
                 taille=item.get('taille', '')
             )
         return render(request, 'boutique/success.html', {'commande': cmd})
@@ -171,12 +165,10 @@ def admin_stock(request):
 def admin_variant_ajouter(request, produit_pk):
     produit = get_object_or_404(Produit, pk=produit_pk)
     if request.method == 'POST':
-        couleur = request.POST.get('couleur', '').strip()
         taille = request.POST.get('taille', '').strip()
         stock = int(request.POST.get('stock', 0))
         variant, created = ProduitVariant.objects.get_or_create(
             produit=produit,
-            couleur=couleur,
             taille=taille,
             defaults={'stock': stock}
         )
