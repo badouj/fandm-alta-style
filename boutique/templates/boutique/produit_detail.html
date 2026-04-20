@@ -14,8 +14,6 @@
 .variant-btn{background:none;border:1px solid var(--border);padding:8px 16px;font-family:'Montserrat',sans-serif;font-size:0.75rem;cursor:pointer;transition:all 0.3s;min-width:44px}
 .variant-btn:hover,.variant-btn.selected{background:var(--black);color:var(--white);border-color:var(--black)}
 .variant-error{color:#e53e3e;font-size:0.75rem;margin-top:0.5rem;margin-bottom:0.5rem;display:none}
-.stock-info{font-size:0.75rem;color:var(--gray);margin-top:0.5rem;margin-bottom:1rem}
-.stock-info.low{color:#e53e3e}
 .qty-control{display:flex;align-items:center;gap:0;width:fit-content;border:1px solid var(--border);margin-bottom:1.5rem}
 .qty-btn{background:none;border:none;width:44px;height:44px;font-size:1.2rem;cursor:pointer;transition:background 0.2s;font-family:'Montserrat',sans-serif}
 .qty-btn:hover{background:var(--cream)}
@@ -48,7 +46,6 @@
     <p class="qty-label">Taille</p>
     <div style="display:flex;gap:0.5rem;flex-wrap:wrap" id="taillesWrapper"></div>
     <p class="variant-error" id="tailleError">⚠ Veuillez choisir une taille</p>
-    <p class="stock-info" id="stockInfo"></p>
     {% else %}
     <p style="color:#e53e3e;font-size:0.85rem;margin-bottom:1.5rem">⚠ Produit épuisé</p>
     {% endif %}
@@ -103,14 +100,6 @@ function selectTaille(btn, variant) {
   selectedTaille = variant.taille;
   selectedVariantId = variant.id;
   document.getElementById('tailleError').style.display = 'none';
-  var stockInfo = document.getElementById('stockInfo');
-  if (variant.stock <= 3) {
-    stockInfo.textContent = 'Plus que ' + variant.stock + ' en stock!';
-    stockInfo.className = 'stock-info low';
-  } else {
-    stockInfo.textContent = 'En stock (' + variant.stock + ' disponibles)';
-    stockInfo.className = 'stock-info';
-  }
   document.getElementById('qty').max = variant.stock;
   if (parseInt(document.getElementById('qty').value) > variant.stock) {
     document.getElementById('qty').value = variant.stock;
@@ -129,12 +118,10 @@ function addToCartDetail(btn) {
   var nom = btn.dataset.nom;
   var prix = parseFloat(btn.dataset.prix);
   var qty = parseInt(document.getElementById('qty').value);
-
   if (!selectedTaille) {
     document.getElementById('tailleError').style.display = 'block';
     return;
   }
-
   var cart = JSON.parse(localStorage.getItem('cart') || '[]');
   var existing = cart.find(function(i) { return i.variant_id === selectedVariantId; });
   if (existing) {
