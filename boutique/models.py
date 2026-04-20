@@ -41,15 +41,14 @@ class Produit(models.Model):
 
 class ProduitVariant(models.Model):
     produit = models.ForeignKey(Produit, on_delete=models.CASCADE, related_name='variants')
-    couleur = models.CharField(max_length=100)
     taille = models.CharField(max_length=20)
     stock = models.IntegerField(default=0)
 
     def __str__(self):
-        return f"{self.produit.nom} - {self.couleur} - {self.taille}"
+        return f"{self.produit.nom} - {self.taille}"
 
     class Meta:
-        unique_together = ['produit', 'couleur', 'taille']
+        unique_together = ['produit', 'taille']
 
 
 class Commande(models.Model):
@@ -78,7 +77,6 @@ class LigneCommande(models.Model):
     variant = models.ForeignKey(ProduitVariant, on_delete=models.SET_NULL, null=True, blank=True)
     quantite = models.IntegerField(default=1)
     prix_unitaire = models.DecimalField(max_digits=10, decimal_places=3)
-    couleur = models.CharField(max_length=100, blank=True, default='')
     taille = models.CharField(max_length=20, blank=True, default='')
 
     def __str__(self):

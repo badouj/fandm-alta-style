@@ -4,7 +4,7 @@ from .models import Produit, ProduitVariant, Commande, LigneCommande
 class ProduitVariantInline(admin.TabularInline):
     model = ProduitVariant
     extra = 1
-    fields = ['couleur', 'taille', 'stock']
+    fields = ['taille', 'stock']
 
 class LigneCommandeInline(admin.TabularInline):
     model = LigneCommande
@@ -20,8 +20,8 @@ class ProduitAdmin(admin.ModelAdmin):
 
 @admin.register(ProduitVariant)
 class ProduitVariantAdmin(admin.ModelAdmin):
-    list_display = ['produit', 'couleur', 'taille', 'stock']
-    list_filter = ['couleur', 'taille']
+    list_display = ['produit', 'taille', 'stock']
+    list_filter = ['taille']
     list_editable = ['stock']
 
 @admin.register(Commande)
@@ -34,4 +34,4 @@ class CommandeAdmin(admin.ModelAdmin):
 
 @admin.register(LigneCommande)
 class LigneCommandeAdmin(admin.ModelAdmin):
-    list_display = ['commande', 'produit', 'couleur', 'taille', 'quantite', 'prix_unitaire']
+    list_display = ['commande', 'produit', 'taille', 'quantite', 'prix_unitaire']
