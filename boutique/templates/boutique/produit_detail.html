@@ -44,10 +44,7 @@
     <p class="detail-price">{{ produit.prix }} DT</p>
     <p class="detail-desc">{{ produit.description }}</p>
 
-    {% if couleurs %}
-    <p class="qty-label">Couleur</p>
-    <div style="display:flex;gap:0.5rem;flex-wrap:wrap" id="couleursWrapper"></div>
-    <p class="variant-error" id="couleurError">⚠ Veuillez choisir une couleur</p>
+    {% if variants %}
     <p class="qty-label">Taille</p>
     <div style="display:flex;gap:0.5rem;flex-wrap:wrap" id="taillesWrapper"></div>
     <p class="variant-error" id="tailleError">⚠ Veuillez choisir une taille</p>
@@ -70,7 +67,7 @@
       data-nom="{{ produit.nom|escapejs }}"
       data-prix="{{ produit.prix }}"
       onclick="addToCartDetail(this)"
-      {% if not couleurs %}disabled style="opacity:0.5;cursor:not-allowed"{% endif %}>
+      {% if not variants %}disabled style="opacity:0.5;cursor:not-allowed"{% endif %}>
       Ajouter au Panier
     </button>
 
@@ -83,42 +80,18 @@
 
 {% block scripts %}
 <script>
-var variantsData = JSON.parse('{{ variants_data|escapejs }}');
-var couleurs = JSON.parse('{{ couleurs_json|escapejs }}');
-var selectedCouleur = '';
+var variantsData = JSON.parse('{{ variants_json|escapejs }}');
 var selectedTaille = '';
 var selectedVariantId = null;
 
-var couleursWrapper = document.getElementById('couleursWrapper');
-if (couleursWrapper && couleurs.length > 0) {
-  couleurs.forEach(function(c) {
+var taillesWrapper = document.getElementById('taillesWrapper');
+if (taillesWrapper && variantsData.length > 0) {
+  variantsData.forEach(function(v) {
     var btn = document.createElement('button');
     btn.className = 'variant-btn';
-    btn.textContent = c;
-    btn.onclick = function() { selectCouleur(btn, c); };
-    couleursWrapper.appendChild(btn);
-  });
-}
-
-function selectCouleur(btn, couleur) {
-  document.querySelectorAll('#couleursWrapper .variant-btn').forEach(function(b) {
-    b.classList.remove('selected');
-  });
-  btn.classList.add('selected');
-  selectedCouleur = couleur;
-  selectedTaille = '';
-  selectedVariantId = null;
-  document.getElementById('couleurError').style.display = 'none';
-  document.getElementById('stockInfo').textContent = '';
-  var taillesWrapper = document.getElementById('taillesWrapper');
-  taillesWrapper.innerHTML = '';
-  var tailles = variantsData[couleur] || [];
-  tailles.forEach(function(v) {
-    var tbtn = document.createElement('button');
-    tbtn.className = 'variant-btn';
-    tbtn.textContent = v.taille;
-    tbtn.onclick = function() { selectTaille(tbtn, v); };
-    taillesWrapper.appendChild(tbtn);
+    btn.textContent = v.taille;
+    btn.onclick = function() { selectTaille(btn, v); };
+    taillesWrapper.appendChild(btn);
   });
 }
 
@@ -156,14 +129,12 @@ function addToCartDetail(btn) {
   var nom = btn.dataset.nom;
   var prix = parseFloat(btn.dataset.prix);
   var qty = parseInt(document.getElementById('qty').value);
-  if (!selectedCouleur) {
-    document.getElementById('couleurError').style.display = 'block';
-    return;
-  }
+
   if (!selectedTaille) {
     document.getElementById('tailleError').style.display = 'block';
     return;
   }
+
   var cart = JSON.parse(localStorage.getItem('cart') || '[]');
   var existing = cart.find(function(i) { return i.variant_id === selectedVariantId; });
   if (existing) {
@@ -174,7 +145,6 @@ function addToCartDetail(btn) {
       nom: nom,
       prix: prix,
       qty: qty,
-      couleur: selectedCouleur,
       taille: selectedTaille,
       variant_id: selectedVariantId
     });
