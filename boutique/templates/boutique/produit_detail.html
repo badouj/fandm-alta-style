@@ -1,161 +1,172 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
-from .models import Produit, ProduitVariant, Commande, LigneCommande
-import json
+{% extends 'boutique/base.html' %}
+{% load static %}
+{% block content %}
+<style>
+.detail-wrapper{max-width:1100px;margin:3rem auto;padding:0 2rem;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start}
+.detail-img{aspect-ratio:3/4;background:var(--cream);display:flex;align-items:center;justify-content:center;font-size:8rem;border:1px solid var(--border);overflow:hidden}
+.detail-img img{width:100%;height:100%;object-fit:cover}
+.detail-info{padding-top:1rem}
+.detail-cat{font-size:0.65rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:0.75rem}
+.detail-name{font-family:'Cormorant Garamond',serif;font-size:2.5rem;font-weight:600;line-height:1.2;margin-bottom:1rem}
+.detail-price{font-size:1.5rem;font-weight:600;color:var(--gold);margin-bottom:1.5rem}
+.detail-desc{font-size:0.85rem;color:var(--gray);line-height:1.8;margin-bottom:1.5rem;padding-bottom:1.5rem;border-bottom:1px solid var(--border)}
+.qty-label{font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--gray);margin-bottom:0.75rem;margin-top:1.25rem}
+.variant-btn{background:none;border:1px solid var(--border);padding:8px 16px;font-family:'Montserrat',sans-serif;font-size:0.75rem;cursor:pointer;transition:all 0.3s;min-width:44px}
+.variant-btn:hover,.variant-btn.selected{background:var(--black);color:var(--white);border-color:var(--black)}
+.variant-error{color:#e53e3e;font-size:0.75rem;margin-top:0.5rem;margin-bottom:0.5rem;display:none}
+.stock-info{font-size:0.75rem;color:var(--gray);margin-top:0.5rem;margin-bottom:1rem}
+.stock-info.low{color:#e53e3e}
+.qty-control{display:flex;align-items:center;gap:0;width:fit-content;border:1px solid var(--border);margin-bottom:1.5rem}
+.qty-btn{background:none;border:none;width:44px;height:44px;font-size:1.2rem;cursor:pointer;transition:background 0.2s;font-family:'Montserrat',sans-serif}
+.qty-btn:hover{background:var(--cream)}
+.qty-num{width:60px;height:44px;text-align:center;font-size:1rem;font-weight:500;border:none;border-left:1px solid var(--border);border-right:1px solid var(--border);font-family:'Montserrat',sans-serif;outline:none}
+.add-to-cart-btn{width:100%;background:var(--black);color:var(--white);border:none;padding:16px;font-family:'Montserrat',sans-serif;font-size:0.75rem;letter-spacing:3px;text-transform:uppercase;cursor:pointer;transition:background 0.3s;margin-bottom:1rem}
+.add-to-cart-btn:hover{background:var(--gold)}
+.back-link{display:inline-block;font-size:0.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--gray);text-decoration:none;margin-bottom:2rem;transition:color 0.3s}
+.back-link:hover{color:var(--gold)}
+.success-msg{background:#d4edda;color:#155724;padding:12px 16px;font-size:0.8rem;margin-bottom:1rem;display:none}
+</style>
 
-def accueil(request):
-    produits = Produit.objects.filter(disponible=True)[:3]
-    return render(request, 'boutique/accueil.html', {'produits': produits})
+<div style="max-width:1100px;margin:2rem auto;padding:0 2rem">
+  <a href="/catalogue/" class="back-link">← Retour au catalogue</a>
+</div>
 
-def catalogue(request):
-    categorie = request.GET.get('cat', 'all')
-    sous_categorie = request.GET.get('sous', '')
-    if categorie == 'all':
-        produits = Produit.objects.filter(disponible=True)
-    elif sous_categorie:
-        produits = Produit.objects.filter(disponible=True, categorie=categorie, sous_categorie=sous_categorie)
-    else:
-        produits = Produit.objects.filter(disponible=True, categorie=categorie)
-    return render(request, 'boutique/catalogue.html', {
-        'produits': produits,
-        'categorie': categorie,
-        'sous_categorie': sous_categorie
-    })
+<div class="detail-wrapper">
+  <div class="detail-img">
+    {% if produit.image %}
+    <img src="{{ produit.image.url }}" alt="{{ produit.nom }}">
+    {% else %}🥻{% endif %}
+  </div>
 
-def panier(request):
-    return render(request, 'boutique/panier.html')
+  <div class="detail-info">
+    <p class="detail-cat">{{ produit.get_categorie_display }} — {{ produit.get_sous_categorie_display }}</p>
+    <h1 class="detail-name">{{ produit.nom }}</h1>
+    <p class="detail-price">{{ produit.prix }} DT</p>
+    <p class="detail-desc">{{ produit.description }}</p>
 
-def produit_detail(request, pk):
-    produit = get_object_or_404(Produit, pk=pk)
-    variants = produit.variants.filter(stock__gt=0)
-    couleurs = list(variants.values_list('couleur', flat=True).distinct())
-    couleurs_json = json.dumps(couleurs)
-    variants_data = {}
-    for v in variants:
-        if v.couleur not in variants_data:
-            variants_data[v.couleur] = []
-        variants_data[v.couleur].append({
-            'id': v.id,
-            'taille': v.taille,
-            'stock': v.stock
-        })
-    return render(request, 'boutique/produit_detail.html', {
-        'produit': produit,
-        'couleurs': couleurs,
-        'couleurs_json': couleurs_json,
-        'variants_data': json.dumps(variants_data),
-    })
+    {% if couleurs %}
+    <p class="qty-label">Couleur</p>
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap" id="couleursWrapper"></div>
+    <p class="variant-error" id="couleurError">⚠ Veuillez choisir une couleur</p>
 
-def commande(request):
-    if request.method == 'POST':
-        panier_data = json.loads(request.POST.get('panier', '[]'))
-        if not panier_data:
-            return redirect('panier')
-        total = sum(item['prix'] * item['qty'] for item in panier_data)
-        cmd = Commande.objects.create(
-            nom_client=request.POST['nom'],
-            telephone=request.POST['telephone'],
-            adresse=request.POST['adresse'],
-            notes=request.POST.get('notes', ''),
-            total=total
-        )
-        for item in panier_data:
-            produit = Produit.objects.get(id=item['id'])
-            variant = None
-            if item.get('variant_id'):
-                try:
-                    variant = ProduitVariant.objects.get(id=item['variant_id'])
-                    if variant.stock >= item['qty']:
-                        variant.stock -= item['qty']
-                        variant.save()
-                except ProduitVariant.DoesNotExist:
-                    pass
-            LigneCommande.objects.create(
-                commande=cmd,
-                produit=produit,
-                variant=variant,
-                quantite=item['qty'],
-                prix_unitaire=item['prix'],
-                couleur=item.get('couleur', ''),
-                taille=item.get('taille', '')
-            )
-        return render(request, 'boutique/success.html', {'commande': cmd})
-    return render(request, 'boutique/commande.html')
+    <p class="qty-label">Taille</p>
+    <div style="display:flex;gap:0.5rem;flex-wrap:wrap" id="taillesWrapper"></div>
+    <p class="variant-error" id="tailleError">⚠ Veuillez choisir une taille</p>
+    <p class="stock-info" id="stockInfo"></p>
+    {% else %}
+    <p style="color:#e53e3e;font-size:0.85rem;margin-bottom:1.5rem">⚠ Produit épuisé</p>
+    {% endif %}
 
-def admin_login(request):
-    error = None
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
-        if user is not None and user.is_staff:
-            login(request, user)
-            return redirect('admin_dashboard')
-        else:
-            error = "Identifiants incorrects ou accès refusé."
-    return render(request, 'boutique/admin_login.html', {'error': error})
+    <p class="qty-label">Quantité</p>
+    <div class="qty-control">
+      <button class="qty-btn" onclick="changeQty(-1)">−</button>
+      <input type="number" class="qty-num" id="qty" value="1" min="1" max="99" readonly>
+      <button class="qty-btn" onclick="changeQty(1)">+</button>
+    </div>
 
-def admin_logout(request):
-    logout(request)
-    return redirect('admin_login')
+    <div class="success-msg" id="successMsg">✓ Ajouté au panier !</div>
 
-@login_required(login_url='/mon-admin/login/')
-def admin_dashboard(request):
-    produits = Produit.objects.all()
-    commandes = Commande.objects.all().order_by('-date_commande')
-    return render(request, 'boutique/admin_dashboard.html', {
-        'produits': produits,
-        'commandes': commandes
-    })
+    <button class="add-to-cart-btn"
+      data-id="{{ produit.id }}"
+      data-nom="{{ produit.nom|escapejs }}"
+      data-prix="{{ produit.prix }}"
+      onclick="addToCartDetail(this)"
+      {% if not couleurs %}disabled style="opacity:0.5;cursor:not-allowed"{% endif %}>
+      Ajouter au Panier
+    </button>
 
-@login_required(login_url='/mon-admin/login/')
-def admin_produit_ajouter(request):
-    if request.method == 'POST':
-        Produit.objects.create(
-            nom=request.POST['nom'],
-            description=request.POST['description'],
-            prix=request.POST['prix'],
-            categorie=request.POST['categorie'],
-            sous_categorie=request.POST.get('sous_categorie', ''),
-            image=request.FILES.get('image'),
-            disponible='disponible' in request.POST
-        )
-        return redirect('admin_dashboard')
-    return render(request, 'boutique/admin_produit_form.html', {'action': 'Ajouter'})
+    <a href="/panier/" class="btn-outline" style="width:100%;text-align:center;display:block;padding:14px">
+      Voir le Panier
+    </a>
+  </div>
+</div>
+{% endblock %}
 
-@login_required(login_url='/mon-admin/login/')
-def admin_produit_modifier(request, pk):
-    produit = get_object_or_404(Produit, pk=pk)
-    if request.method == 'POST':
-        produit.nom = request.POST['nom']
-        produit.description = request.POST['description']
-        produit.prix = request.POST['prix']
-        produit.categorie = request.POST['categorie']
-        produit.sous_categorie = request.POST.get('sous_categorie', '')
-        produit.disponible = 'disponible' in request.POST
-        if request.FILES.get('image'):
-            produit.image = request.FILES['image']
-        produit.save()
-        return redirect('admin_dashboard')
-    return render(request, 'boutique/admin_produit_form.html', {
-        'action': 'Modifier',
-        'produit': produit
-    })
+{% block scripts %}
+<script>
+const variantsData = {{ variants_data|safe }};
+const couleurs = {{ couleurs_json|safe }};
+let selectedCouleur = '';
+let selectedTaille = '';
+let selectedVariantId = null;
 
-@login_required(login_url='/mon-admin/login/')
-def admin_produit_supprimer(request, pk):
-    produit = get_object_or_404(Produit, pk=pk)
-    if request.method == 'POST':
-        produit.delete()
-        return redirect('admin_dashboard')
-    return render(request, 'boutique/admin_supprimer.html', {'produit': produit})
+const couleursWrapper = document.getElementById('couleursWrapper');
+if (couleursWrapper) {
+  couleurs.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'variant-btn';
+    btn.textContent = c;
+    btn.onclick = () => selectCouleur(btn, c);
+    couleursWrapper.appendChild(btn);
+  });
+}
 
-@login_required(login_url='/mon-admin/login/')
-def admin_commande_detail(request, pk):
-    commande = get_object_or_404(Commande, pk=pk)
-    if request.method == 'POST':
-        commande.statut = request.POST['statut']
-        commande.save()
-        return redirect('admin_commande_detail', pk=pk)
-    return render(request, 'boutique/admin_commande_detail.html', {'commande': commande})
+function selectCouleur(btn, couleur) {
+  document.querySelectorAll('#couleursWrapper .variant-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedCouleur = couleur;
+  selectedTaille = '';
+  selectedVariantId = null;
+  document.getElementById('couleurError').style.display = 'none';
+  document.getElementById('stockInfo').textContent = '';
+  const taillesWrapper = document.getElementById('taillesWrapper');
+  taillesWrapper.innerHTML = '';
+  const tailles = variantsData[couleur] || [];
+  tailles.forEach(v => {
+    const btn = document.createElement('button');
+    btn.className = 'variant-btn';
+    btn.textContent = v.taille;
+    btn.onclick = () => selectTaille(btn, v);
+    taillesWrapper.appendChild(btn);
+  });
+}
+
+function selectTaille(btn, variant) {
+  document.querySelectorAll('#taillesWrapper .variant-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedTaille = variant.taille;
+  selectedVariantId = variant.id;
+  document.getElementById('tailleError').style.display = 'none';
+  const stockInfo = document.getElementById('stockInfo');
+  if (variant.stock <= 3) {
+    stockInfo.textContent = `⚠ Plus que ${variant.stock} en stock!`;
+    stockInfo.className = 'stock-info low';
+  } else {
+    stockInfo.textContent = `✓ En stock (${variant.stock} disponibles)`;
+    stockInfo.className = 'stock-info';
+  }
+  document.getElementById('qty').max = variant.stock;
+}
+
+function changeQty(val) {
+  const input = document.getElementById('qty');
+  const max = parseInt(input.max) || 99;
+  const newVal = parseInt(input.value) + val;
+  if (newVal >= 1 && newVal <= max) input.value = newVal;
+}
+
+function addToCartDetail(btn) {
+  const id = parseInt(btn.dataset.id);
+  const nom = btn.dataset.nom;
+  const prix = parseFloat(btn.dataset.prix);
+  const qty = parseInt(document.getElementById('qty').value);
+  if (!selectedCouleur) {
+    document.getElementById('couleurError').style.display = 'block';
+    return;
+  }
+  if (!selectedTaille) {
+    document.getElementById('tailleError').style.display = 'block';
+    return;
+  }
+  let cart = JSON.parse(localStorage.getItem('cart') || '[]');
+  const existing = cart.find(i => i.variant_id === selectedVariantId);
+  if (existing) existing.qty += qty;
+  else cart.push({id, nom, prix, qty, couleur: selectedCouleur, taille: selectedTaille, variant_id: selectedVariantId});
+  localStorage.setItem('cart', JSON.stringify(cart));
+  updateCartCount();
+  const msg = document.getElementById('successMsg');
+  msg.style.display = 'block';
+  setTimeout(() => msg.style.display = 'none', 2000);
+}
+</script>
+{% endblock %}

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
@@ -40,11 +41,12 @@ def produit_detail(request, pk):
             'taille': v.taille,
             'stock': v.stock
         })
+    variants_data_json = json.dumps(variants_data)
     return render(request, 'boutique/produit_detail.html', {
         'produit': produit,
         'couleurs': couleurs,
         'couleurs_json': couleurs_json,
-        'variants_data': json.dumps(variants_data),
+        'variants_data': variants_data_json,
     })
 
 def commande(request):
@@ -160,44 +162,6 @@ def admin_commande_detail(request, pk):
         return redirect('admin_commande_detail', pk=pk)
     return render(request, 'boutique/admin_commande_detail.html', {'commande': commande})
 
-@login_required(login_url='/mon-admin/login/')
-def admin_stock(request):
-    produits = Produit.objects.all().prefetch_related('variants')
-    return render(request, 'boutique/admin_stock.html', {'produits': produits})
-
-@login_required(login_url='/mon-admin/login/')
-def admin_variant_ajouter(request, produit_pk):
-    produit = get_object_or_404(Produit, pk=produit_pk)
-    if request.method == 'POST':
-        couleur = request.POST.get('couleur', '').strip()
-        taille = request.POST.get('taille', '').strip()
-        stock = int(request.POST.get('stock', 0))
-        variant, created = ProduitVariant.objects.get_or_create(
-            produit=produit,
-            couleur=couleur,
-            taille=taille,
-            defaults={'stock': stock}
-        )
-        if not created:
-            variant.stock = stock
-            variant.save()
-        return redirect('admin_stock')
-    return render(request, 'boutique/admin_variant_form.html', {'produit': produit})
-
-@login_required(login_url='/mon-admin/login/')
-def admin_variant_supprimer(request, pk):
-    variant = get_object_or_404(ProduitVariant, pk=pk)
-    if request.method == 'POST':
-        variant.delete()
-    return redirect('admin_stock')
-
-@login_required(login_url='/mon-admin/login/')
-def admin_stock_update(request, pk):
-    variant = get_object_or_404(ProduitVariant, pk=pk)
-    if request.method == 'POST':
-        variant.stock = int(request.POST.get('stock', 0))
-        variant.save()
-    return redirect('admin_stock')
 @login_required(login_url='/mon-admin/login/')
 def admin_stock(request):
     produits = Produit.objects.all().prefetch_related('variants')
