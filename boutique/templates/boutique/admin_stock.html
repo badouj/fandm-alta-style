@@ -60,10 +60,10 @@
           <td><strong>{{ variant.taille }}</strong></td>
           <td>
             <form method="POST" action="/mon-admin/stock/update/{{ variant.pk }}/" style="display:flex;gap:0.5rem;align-items:center">
-              {% csrf_token %}
-              <input type="number" name="stock" value="{{ variant.stock }}" min="0" class="stock-input">
-              <button type="submit" class="btn-save">Save</button>
-            </form>
+  {% csrf_token %}
+  <input type="number" name="stock" value="{{ variant.stock }}" min="0" class="stock-input">
+  <button type="submit" class="btn-save">Modifier</button>
+</form>
           </td>
           <td>
             {% if variant.stock == 0 %}
