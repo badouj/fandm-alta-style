@@ -84,72 +84,72 @@
 
 {% block scripts %}
 <script>
-const variantsData = {{ variants_data|safe }};
-const couleurs = {{ couleurs_json|safe }};
-let selectedCouleur = '';
-let selectedTaille = '';
-let selectedVariantId = null;
+var variantsData = JSON.parse('{{ variants_data|escapejs }}');
+var couleurs = JSON.parse('{{ couleurs_json|escapejs }}');
+var selectedCouleur = '';
+var selectedTaille = '';
+var selectedVariantId = null;
 
-const couleursWrapper = document.getElementById('couleursWrapper');
-if (couleursWrapper) {
-  couleurs.forEach(c => {
-    const btn = document.createElement('button');
+var couleursWrapper = document.getElementById('couleursWrapper');
+if (couleursWrapper && couleurs.length > 0) {
+  couleurs.forEach(function(c) {
+    var btn = document.createElement('button');
     btn.className = 'variant-btn';
     btn.textContent = c;
-    btn.onclick = () => selectCouleur(btn, c);
+    btn.onclick = function() { selectCouleur(btn, c); };
     couleursWrapper.appendChild(btn);
   });
 }
 
 function selectCouleur(btn, couleur) {
-  document.querySelectorAll('#couleursWrapper .variant-btn').forEach(b => b.classList.remove('selected'));
+  document.querySelectorAll('#couleursWrapper .variant-btn').forEach(function(b) { b.classList.remove('selected'); });
   btn.classList.add('selected');
   selectedCouleur = couleur;
   selectedTaille = '';
   selectedVariantId = null;
   document.getElementById('couleurError').style.display = 'none';
   document.getElementById('stockInfo').textContent = '';
-  const taillesWrapper = document.getElementById('taillesWrapper');
+  var taillesWrapper = document.getElementById('taillesWrapper');
   taillesWrapper.innerHTML = '';
-  const tailles = variantsData[couleur] || [];
-  tailles.forEach(v => {
-    const btn = document.createElement('button');
+  var tailles = variantsData[couleur] || [];
+  tailles.forEach(function(v) {
+    var btn = document.createElement('button');
     btn.className = 'variant-btn';
     btn.textContent = v.taille;
-    btn.onclick = () => selectTaille(btn, v);
+    btn.onclick = function() { selectTaille(btn, v); };
     taillesWrapper.appendChild(btn);
   });
 }
 
 function selectTaille(btn, variant) {
-  document.querySelectorAll('#taillesWrapper .variant-btn').forEach(b => b.classList.remove('selected'));
+  document.querySelectorAll('#taillesWrapper .variant-btn').forEach(function(b) { b.classList.remove('selected'); });
   btn.classList.add('selected');
   selectedTaille = variant.taille;
   selectedVariantId = variant.id;
   document.getElementById('tailleError').style.display = 'none';
-  const stockInfo = document.getElementById('stockInfo');
+  var stockInfo = document.getElementById('stockInfo');
   if (variant.stock <= 3) {
-    stockInfo.textContent = `⚠ Plus que ${variant.stock} en stock!`;
+    stockInfo.textContent = 'Plus que ' + variant.stock + ' en stock!';
     stockInfo.className = 'stock-info low';
   } else {
-    stockInfo.textContent = `✓ En stock (${variant.stock} disponibles)`;
+    stockInfo.textContent = 'En stock (' + variant.stock + ' disponibles)';
     stockInfo.className = 'stock-info';
   }
   document.getElementById('qty').max = variant.stock;
 }
 
 function changeQty(val) {
-  const input = document.getElementById('qty');
-  const max = parseInt(input.max) || 99;
-  const newVal = parseInt(input.value) + val;
+  var input = document.getElementById('qty');
+  var max = parseInt(input.max) || 99;
+  var newVal = parseInt(input.value) + val;
   if (newVal >= 1 && newVal <= max) input.value = newVal;
 }
 
 function addToCartDetail(btn) {
-  const id = parseInt(btn.dataset.id);
-  const nom = btn.dataset.nom;
-  const prix = parseFloat(btn.dataset.prix);
-  const qty = parseInt(document.getElementById('qty').value);
+  var id = parseInt(btn.dataset.id);
+  var nom = btn.dataset.nom;
+  var prix = parseFloat(btn.dataset.prix);
+  var qty = parseInt(document.getElementById('qty').value);
   if (!selectedCouleur) {
     document.getElementById('couleurError').style.display = 'block';
     return;
@@ -158,15 +158,18 @@ function addToCartDetail(btn) {
     document.getElementById('tailleError').style.display = 'block';
     return;
   }
-  let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-  const existing = cart.find(i => i.variant_id === selectedVariantId);
-  if (existing) existing.qty += qty;
-  else cart.push({id, nom, prix, qty, couleur: selectedCouleur, taille: selectedTaille, variant_id: selectedVariantId});
+  var cart = JSON.parse(localStorage.getItem('cart') || '[]');
+  var existing = cart.find(function(i) { return i.variant_id === selectedVariantId; });
+  if (existing) {
+    existing.qty += qty;
+  } else {
+    cart.push({id: id, nom: nom, prix: prix, qty: qty, couleur: selectedCouleur, taille: selectedTaille, variant_id: selectedVariantId});
+  }
   localStorage.setItem('cart', JSON.stringify(cart));
   updateCartCount();
-  const msg = document.getElementById('successMsg');
+  var msg = document.getElementById('successMsg');
   msg.style.display = 'block';
-  setTimeout(() => msg.style.display = 'none', 2000);
+  setTimeout(function() { msg.style.display = 'none'; }, 2000);
 }
 </script>
 {% endblock %}
