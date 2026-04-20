@@ -48,7 +48,6 @@
     <p class="qty-label">Couleur</p>
     <div style="display:flex;gap:0.5rem;flex-wrap:wrap" id="couleursWrapper"></div>
     <p class="variant-error" id="couleurError">⚠ Veuillez choisir une couleur</p>
-
     <p class="qty-label">Taille</p>
     <div style="display:flex;gap:0.5rem;flex-wrap:wrap" id="taillesWrapper"></div>
     <p class="variant-error" id="tailleError">⚠ Veuillez choisir une taille</p>
@@ -102,7 +101,9 @@ if (couleursWrapper && couleurs.length > 0) {
 }
 
 function selectCouleur(btn, couleur) {
-  document.querySelectorAll('#couleursWrapper .variant-btn').forEach(function(b) { b.classList.remove('selected'); });
+  document.querySelectorAll('#couleursWrapper .variant-btn').forEach(function(b) {
+    b.classList.remove('selected');
+  });
   btn.classList.add('selected');
   selectedCouleur = couleur;
   selectedTaille = '';
@@ -113,16 +114,18 @@ function selectCouleur(btn, couleur) {
   taillesWrapper.innerHTML = '';
   var tailles = variantsData[couleur] || [];
   tailles.forEach(function(v) {
-    var btn = document.createElement('button');
-    btn.className = 'variant-btn';
-    btn.textContent = v.taille;
-    btn.onclick = function() { selectTaille(btn, v); };
-    taillesWrapper.appendChild(btn);
+    var tbtn = document.createElement('button');
+    tbtn.className = 'variant-btn';
+    tbtn.textContent = v.taille;
+    tbtn.onclick = function() { selectTaille(tbtn, v); };
+    taillesWrapper.appendChild(tbtn);
   });
 }
 
 function selectTaille(btn, variant) {
-  document.querySelectorAll('#taillesWrapper .variant-btn').forEach(function(b) { b.classList.remove('selected'); });
+  document.querySelectorAll('#taillesWrapper .variant-btn').forEach(function(b) {
+    b.classList.remove('selected');
+  });
   btn.classList.add('selected');
   selectedTaille = variant.taille;
   selectedVariantId = variant.id;
@@ -136,6 +139,9 @@ function selectTaille(btn, variant) {
     stockInfo.className = 'stock-info';
   }
   document.getElementById('qty').max = variant.stock;
+  if (parseInt(document.getElementById('qty').value) > variant.stock) {
+    document.getElementById('qty').value = variant.stock;
+  }
 }
 
 function changeQty(val) {
@@ -163,7 +169,15 @@ function addToCartDetail(btn) {
   if (existing) {
     existing.qty += qty;
   } else {
-    cart.push({id: id, nom: nom, prix: prix, qty: qty, couleur: selectedCouleur, taille: selectedTaille, variant_id: selectedVariantId});
+    cart.push({
+      id: id,
+      nom: nom,
+      prix: prix,
+      qty: qty,
+      couleur: selectedCouleur,
+      taille: selectedTaille,
+      variant_id: selectedVariantId
+    });
   }
   localStorage.setItem('cart', JSON.stringify(cart));
   updateCartCount();
