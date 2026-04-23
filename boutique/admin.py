@@ -1,10 +1,14 @@
 from django.contrib import admin
-from .models import Produit, ProduitVariant, Commande, LigneCommande
+from .models import Produit, ProduitVariant, ProduitImage, Commande, LigneCommande
 
 class ProduitVariantInline(admin.TabularInline):
     model = ProduitVariant
     extra = 1
     fields = ['taille', 'stock']
+
+class ProduitImageInline(admin.TabularInline):
+    model = ProduitImage
+    extra = 3
 
 class LigneCommandeInline(admin.TabularInline):
     model = LigneCommande
@@ -16,13 +20,17 @@ class ProduitAdmin(admin.ModelAdmin):
     list_filter = ['categorie', 'sous_categorie', 'disponible']
     search_fields = ['nom']
     list_editable = ['disponible', 'prix']
-    inlines = [ProduitVariantInline]
+    inlines = [ProduitVariantInline, ProduitImageInline]
 
 @admin.register(ProduitVariant)
 class ProduitVariantAdmin(admin.ModelAdmin):
     list_display = ['produit', 'taille', 'stock']
     list_filter = ['taille']
     list_editable = ['stock']
+
+@admin.register(ProduitImage)
+class ProduitImageAdmin(admin.ModelAdmin):
+    list_display = ['produit', 'image']
 
 @admin.register(Commande)
 class CommandeAdmin(admin.ModelAdmin):

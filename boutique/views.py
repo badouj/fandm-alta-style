@@ -2,7 +2,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from .models import Produit, ProduitVariant, Commande, LigneCommande
+from .models import Produit, ProduitVariant, ProduitImage, Commande, LigneCommande
 import json
 
 def accueil(request):
@@ -30,6 +30,7 @@ def panier(request):
 def produit_detail(request, pk):
     produit = get_object_or_404(Produit, pk=pk)
     variants = produit.variants.filter(stock__gt=0)
+    images = list(produit.images.all())
     variants_data = []
     for v in variants:
         variants_data.append({
@@ -42,6 +43,7 @@ def produit_detail(request, pk):
         'produit': produit,
         'variants': variants,
         'variants_json': variants_json,
+        'images': images,
     })
 
 def commande(request):

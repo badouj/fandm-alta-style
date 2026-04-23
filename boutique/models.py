@@ -81,3 +81,9 @@ class LigneCommande(models.Model):
 
     def __str__(self):
         return f"{self.produit.nom} x{self.quantite}"
+    class ProduitImage(models.Model):
+        produit = models.ForeignKey(Produit, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='produits/')
+
+    def __str__(self):
+        return f"Image de {self.produit.nom}"
