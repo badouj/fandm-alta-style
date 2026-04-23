@@ -16,6 +16,10 @@
 .current-image{margin-top:0.5rem;font-size:0.75rem;color:var(--gray)}
 .current-image img{width:80px;height:80px;object-fit:cover;display:block;margin-top:0.5rem;border:1px solid var(--border)}
 .form-hint{font-size:0.7rem;color:var(--gray);margin-top:0.4rem}
+.images-grid{display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.75rem}
+.img-item{position:relative}
+.img-item img{width:80px;height:80px;object-fit:cover;border:1px solid var(--border)}
+.img-delete{position:absolute;top:0;right:0;background:#e53e3e;color:white;font-size:0.65rem;padding:2px 5px;text-decoration:none;line-height:1.5}
 </style>
 
 <div class="form-wrapper">
@@ -49,8 +53,7 @@
 
     <div class="form-group">
       <label class="form-label">Sous-catégorie</label>
-      <select name="sous_categorie" id="sous_categorie" class="form-input">
-      </select>
+      <select name="sous_categorie" id="sous_categorie" class="form-input"></select>
     </div>
 
     <div class="form-group">
@@ -60,20 +63,28 @@
     </div>
 
     <div class="form-group">
-      <label class="form-label">Tailles</label>
-      <input type="text" name="tailles" class="form-input"
-        value="{% if produit %}{{ produit.tailles }}{% endif %}"
-        placeholder="ex: S,M,L,XL,XXL">
-      <p class="form-hint">Séparer les tailles par une virgule</p>
-    </div>
-
-    <div class="form-group">
-      <label class="form-label">Image</label>
+      <label class="form-label">Image Principale</label>
       <input type="file" name="image" class="form-input" accept="image/*">
       {% if produit and produit.image %}
       <div class="current-image">
         Image actuelle :
         <img src="{{ produit.image.url }}" alt="{{ produit.nom }}">
+      </div>
+      {% endif %}
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Photos supplémentaires</label>
+      <input type="file" name="images" class="form-input" accept="image/*" multiple>
+      <p class="form-hint">Sélectionner plusieurs photos à la fois</p>
+      {% if produit %}
+      <div class="images-grid">
+        {% for img in produit.images.all %}
+        <div class="img-item">
+          <img src="{{ img.image.url }}" alt="">
+          <a href="/mon-admin/images/supprimer/{{ img.pk }}/" class="img-delete">✕</a>
+        </div>
+        {% endfor %}
       </div>
       {% endif %}
     </div>

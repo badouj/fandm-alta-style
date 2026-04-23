@@ -110,7 +110,7 @@ def admin_dashboard(request):
 @login_required(login_url='/mon-admin/login/')
 def admin_produit_ajouter(request):
     if request.method == 'POST':
-        Produit.objects.create(
+        produit = Produit.objects.create(
             nom=request.POST['nom'],
             description=request.POST['description'],
             prix=request.POST['prix'],
@@ -119,6 +119,8 @@ def admin_produit_ajouter(request):
             image=request.FILES.get('image'),
             disponible='disponible' in request.POST
         )
+        for img in request.FILES.getlist('images'):
+            ProduitImage.objects.create(produit=produit, image=img)
         return redirect('admin_dashboard')
     return render(request, 'boutique/admin_produit_form.html', {'action': 'Ajouter'})
 
@@ -134,6 +136,8 @@ def admin_produit_modifier(request, pk):
         produit.disponible = 'disponible' in request.POST
         if request.FILES.get('image'):
             produit.image = request.FILES['image']
+        for img in request.FILES.getlist('images'):
+            ProduitImage.objects.create(produit=produit, image=img)
         produit.save()
         return redirect('admin_dashboard')
     return render(request, 'boutique/admin_produit_form.html', {
@@ -194,3 +198,10 @@ def admin_stock_update(request, pk):
         variant.stock = int(request.POST.get('stock', 0))
         variant.save()
     return redirect('admin_stock')
+
+@login_required(login_url='/mon-admin/login/')
+def admin_image_supprimer(request, pk):
+    image = get_object_or_404(ProduitImage, pk=pk)
+    produit_pk = image.produit.pk
+    image.delete()
+    return redirect('admin_produit_modifier', pk=produit_pk)
