@@ -1,12 +1,12 @@
 from django.db import models
 
+
 class Produit(models.Model):
     CATEGORIES = [
         ('femme', 'Femme'),
         ('homme', 'Homme'),
         ('enfants', 'Enfants'),
     ]
-
     SOUS_CATEGORIES = [
         ('jebba_f', 'Jebba Femme'),
         ('dengri_f', 'Dengri Femme'),
@@ -22,7 +22,6 @@ class Produit(models.Model):
         ('herga_e', 'Herga Enfant'),
         ('autre', 'Autre'),
     ]
-
     nom = models.CharField(max_length=200)
     description = models.TextField()
     prix = models.DecimalField(max_digits=10, decimal_places=3)
@@ -51,14 +50,21 @@ class ProduitVariant(models.Model):
         unique_together = ['produit', 'taille']
 
 
+class ProduitImage(models.Model):
+    produit = models.ForeignKey(Produit, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='produits/')
+
+    def __str__(self):
+        return f"Image de {self.produit.nom}"
+
+
 class Commande(models.Model):
     STATUTS = [
         ('nouveau', 'Nouveau'),
-        ('confirme', 'Confirmé'),
-        ('livre', 'Livré'),
-        ('annule', 'Annulé'),
+        ('confirme', 'Confirme'),
+        ('livre', 'Livre'),
+        ('annule', 'Annule'),
     ]
-
     nom_client = models.CharField(max_length=200)
     telephone = models.CharField(max_length=20)
     adresse = models.TextField()
@@ -81,9 +87,3 @@ class LigneCommande(models.Model):
 
     def __str__(self):
         return f"{self.produit.nom} x{self.quantite}"
-    class ProduitImage(models.Model):
-        produit = models.ForeignKey(Produit, on_delete=models.CASCADE, related_name='images')
-    image = models.ImageField(upload_to='produits/')
-
-    def __str__(self):
-        return f"Image de {self.produit.nom}"
