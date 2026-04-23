@@ -22,4 +22,7 @@ urlpatterns = [
     path('mon-admin/stock/ajouter/<int:produit_pk>/', views.admin_variant_ajouter, name='admin_variant_ajouter'),
     path('mon-admin/stock/supprimer/<int:pk>/', views.admin_variant_supprimer, name='admin_variant_supprimer'),
     path('mon-admin/stock/update/<int:pk>/', views.admin_stock_update, name='admin_stock_update'),
+
+    # IMAGES
+    path('mon-admin/images/supprimer/<int:pk>/', views.admin_image_supprimer, name='admin_image_supprimer'),
 ]
