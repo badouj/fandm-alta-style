@@ -15,7 +15,7 @@
 
 <div class="commande-container">
   <h2 class="commande-title">Finaliser la <span style="color:var(--gold);font-style:italic">Commande</span></h2>
-  
+
   <div class="order-summary">
     <h4>Récapitulatif</h4>
     <div id="summaryLines"></div>
@@ -25,22 +25,66 @@
   <form method="POST" action="/commande/" onsubmit="prepareSubmit()">
     {% csrf_token %}
     <input type="hidden" name="panier" id="panierData">
+    <input type="hidden" name="adresse" id="adresseData">
+
     <div class="form-group">
       <label class="form-label">Nom Complet *</label>
-      <input type="text" name="nom" class="form-input" required placeholder="Votre nom...">
+      <input type="text" name="nom" class="form-input" required placeholder="Votre nom complet...">
     </div>
+
     <div class="form-group">
       <label class="form-label">Téléphone *</label>
       <input type="text" name="telephone" class="form-input" required placeholder="+216 XX XXX XXX">
     </div>
+
     <div class="form-group">
-      <label class="form-label">Adresse de Livraison *</label>
-      <input type="text" name="adresse" class="form-input" required placeholder="Rue, Ville, Gouvernorat...">
+      <label class="form-label">Gouvernorat *</label>
+      <select id="gouvernorat" class="form-input" required onchange="updateVilles()">
+        <option value="">-- Choisir le gouvernorat --</option>
+        <option value="Ariana">Ariana</option>
+        <option value="Béja">Béja</option>
+        <option value="Ben Arous">Ben Arous</option>
+        <option value="Bizerte">Bizerte</option>
+        <option value="Gabès">Gabès</option>
+        <option value="Gafsa">Gafsa</option>
+        <option value="Jendouba">Jendouba</option>
+        <option value="Kairouan">Kairouan</option>
+        <option value="Kasserine">Kasserine</option>
+        <option value="Kébili">Kébili</option>
+        <option value="Kef">Kef</option>
+        <option value="Mahdia">Mahdia</option>
+        <option value="Manouba">Manouba</option>
+        <option value="Médenine">Médenine</option>
+        <option value="Monastir">Monastir</option>
+        <option value="Nabeul">Nabeul</option>
+        <option value="Sfax">Sfax</option>
+        <option value="Sidi Bouzid">Sidi Bouzid</option>
+        <option value="Siliana">Siliana</option>
+        <option value="Sousse">Sousse</option>
+        <option value="Tataouine">Tataouine</option>
+        <option value="Tozeur">Tozeur</option>
+        <option value="Tunis">Tunis</option>
+        <option value="Zaghouan">Zaghouan</option>
+      </select>
     </div>
+
+    <div class="form-group">
+      <label class="form-label">Ville / Délégation *</label>
+      <select id="ville" class="form-input" required>
+        <option value="">-- Choisir d'abord le gouvernorat --</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Adresse complémentaire *</label>
+      <input type="text" id="adresse_comp" name="adresse_comp" class="form-input" required placeholder="Rue, numéro, quartier...">
+    </div>
+
     <div class="form-group">
       <label class="form-label">Notes (optionnel)</label>
       <textarea name="notes" class="form-input" rows="3" placeholder="Taille, couleur préférée..."></textarea>
     </div>
+
     <button type="submit" class="btn-primary" style="width:100%;padding:16px">Confirmer la Commande</button>
   </form>
 </div>
@@ -48,14 +92,59 @@
 
 {% block scripts %}
 <script>
+const villes = {
+  "Tunis": ["Bab Bhar / باب البحر","Bab Souika / باب سويقة","Carthage / قرطاج","El Kabaria / الكبارية","El Menzah / المنزه","El Omrane / العمران","Ettahrir / التحرير","Ezzouhour / الزهور","La Goulette / حلق الوادي","La Marsa / المرسى","La Médina / المدينة","Le Bardo / باردو","Séjoumi / سجومي","Sidi El Béchir / سيدي البشير","Sidi Hassine / سيدي حسين"],
+  "Ariana": ["Ariana / أريانة","Borj Louzir / برج لوزير","Ettadhamen / التضامن","Kalâat el-Andalous / قلعة الأندلس","Mnihla / المنيهلة","Raoued / رواد","Sidi Thabet / سيدي ثابت","Soukra / السوكرة"],
+  "Ben Arous": ["Ben Arous / بن عروس","Bou Mhel el-Bassatine / بومهل البساتين","El Mourouj / المروج","Ezzahra / الزهراء","Fouchana / فوشانة","Hammam Chott / حمام الشط","Hammam Lif / حمام الأنف","Medina Jedida / المدينة الجديدة","Mornag / مرناق","Radès / رادس"],
+  "Manouba": ["Djedeida / الجديدة","Den Den / دندن","Douar Hicher / دوار هيشر","El Battan / البطان","Manouba / منوبة","Oued Ellil / وادي الليل","Tebourba / تبورسق"],
+  "Nabeul": ["Béni Khalled / بني خلاد","Bou Argoub / بوعرقوب","Grombalia / قرمبالية","Hammamet / الحمامات","Kelibia / قليبية","Korba / قربة","Menzel Temime / منزل تميم","Nabeul / نابل","Soliman / سليمان"],
+  "Zaghouan": ["Bir Mcherga / بئر مشارقة","El Fahs / الفحص","Nadhour / الناظور","Zaghouan / زغوان","Zriba / الزريبة"],
+  "Bizerte": ["Bizerte / بنزرت","El Alia / العالية","Mateur / ماطر","Menzel Bourguiba / منزل بورقيبة","Ras Jebel / رأس الجبل","Sejnane / سجنان","Utique / أوتيك"],
+  "Béja": ["Béja / باجة","Medjez el-Bab / مجاز الباب","Nefza / نفزة","Téboursouk / تبرسق","Testour / تستور","Thibar / تيبار"],
+  "Jendouba": ["Ain Drahem / عين دراهم","Bou Salem / بوسالم","Fernana / فرنانة","Ghardimaou / غار الدماء","Jendouba / جندوبة","Oued Mliz / وادي مليز","Tabarka / طبرقة"],
+  "Kef": ["Dahmani / الدهماني","Jerissa / الجريصة","Kalâat Senan / قلعة سنان","Kef / الكاف","Sers / السرس","Tajerouine / تاجروين"],
+  "Siliana": ["Bou Arada / بوعرادة","Gaafour / قعفور","Kesra / كسرى","Makthar / مكثر","Rouhia / الروحية","Siliana / سليانة"],
+  "Sousse": ["Akouda / أكودة","Bouficha / بوفيشة","Enfidha / النفيضة","Hammam Sousse / حمام سوسة","Kalâa Kebira / القلعة الكبرى","Kalâa Seghira / القلعة الصغيرة","Msaken / مساكن","Sidi Bou Ali / سيدي بوعلي","Sousse / سوسة"],
+  "Monastir": ["Bembla / بمبلة","Beni Hassen / بني حسان","Jemmal / جمال","Ksar Hellal / قصر هلال","Moknine / المكنين","Monastir / المنستير","Ouerdanine / الوردانين","Teboulba / طبلبة","Zeramdine / زرمدين"],
+  "Mahdia": ["Bou Merdes / بومرداس","Chebba / الشابة","El Jem / الجم","Ksour Essef / قصور الساف","Mahdia / المهدية","Sidi Alouane / سيدي علوان","Souassi / السواسي"],
+  "Sfax": ["Agareb / عقارب","Bir Ali Ben Khelifa / بئر علي بن خليفة","Centre Ville Sfax / صفاقس المدينة","Chihia / الشيحية","Chraiba / الغريبة","El Amra / العامرة","El Hencha / الحنشة","Esskhira / الصخيرة","Jebeniana / جبنيانة","Kerkenah / قرقنة","Mahras / المحرص","Menzel Chaker / منزل شاكر","Route Mahdia / طريق المهدية","Sfax / صفاقس","Beb Bhar / باب بحر","Nasria / الناصرية","Route Ain / طريق العين","Route Gabes / طريق قابس","Route Gremda / طريق قرمده","Route Kaid Mohamed / طريق القائد محمد","Route Lafrane / طريق الأفران","Route Matar / طريق المطار","Route Menzel Cheker / طريق منزل شاكر","Route Mharza / طريق المحارزة","Route Saltnia / طريق السلطنية","Route Sidi Mansour / طريق سيدي منصور","Route Soukra / طريق سكرة","Route Tanyour / طريق تنيور","Route Tunis / طريق تونس","Sakiet Eddaier / ساقية الدائر","Sakiet Ezzit / ساقية الزيت"],
+  "Kairouan": ["El Alaa / العلا","Haffouz / حفوظ","Kairouan / القيروان","Nasrallah / نصر الله","Oueslatia / الوسلاتية","Sbikha / السبيخة","Chebika / الشبيكة"],
+  "Kasserine": ["Fériana / فريانة","Foussana / فوسانة","Hassi El Ferid / حاسي الفريد","Jediliane / جدليان","Kasserine / القصرين","Sbeitla / سبيطلة","Thala / تالة"],
+  "Sidi Bouzid": ["Bir El Hafey / بئر الحفي","Jilma / جلمة","Meknassy / مكناسي","Mezzouna / مزونة","Ouled Haffouz / أولاد حفوظ","Regueb / الرقاب","Sidi Bouzid / سيدي بوزيد"],
+  "Gabès": ["El Hamma / الحامة","Gabès / قابس","Mareth / مارث","Matmata / مطماطة","Nouvelle Matmata / مطماطة الجديدة","Oudhref / أودرف"],
+  "Médenine": ["Ajim / أجيم","Ben Guerdane / بن قردان","Beni Khedache / بني خداش","Houmt Souk / حومة السوق","Médenine / مدنين","Sidi Makhlouf / سيدي مخلوف","Zarzis / جرجيس"],
+  "Tataouine": ["Bir Lahmar / بئر لحمر","Dhehiba / الذهيبة","Ghomrassen / غمراسن","Remada / رمادة","Smâr / سمار","Tataouine / تطاوين"],
+  "Gafsa": ["Belkhir / بالخير","El Ksar / القصر","Gafsa / قفصة","Métlaoui / المتلوي","Moularès / المولارس","Redeyef / الرديف","Sened / سند"],
+  "Tozeur": ["Degache / دقاش","Hazoua / حزوى","Nefta / نفطة","Tozeur / توزر"],
+  "Kébili": ["Douz / دوز","El Faouar / الفوار","Kébili / قبلي","Souk Lahad / سوق الأحد"]
+};
+
+function updateVilles() {
+  var gouv = document.getElementById('gouvernorat').value;
+  var villeSelect = document.getElementById('ville');
+  villeSelect.innerHTML = '<option value="">-- Choisir la ville --</option>';
+  if (gouv && villes[gouv]) {
+    villes[gouv].forEach(function(v) {
+      var opt = document.createElement('option');
+      opt.value = v.split(' / ')[0].trim();
+      opt.textContent = v;
+      villeSelect.appendChild(opt);
+    });
+  }
+}
+
 const cart = JSON.parse(localStorage.getItem('cart') || '[]');
 const total = cart.reduce((s,i) => s + i.prix * i.qty, 0);
 document.getElementById('summaryLines').innerHTML = cart.map(i =>
-  `<div class="order-line"><span>${i.nom} ×${i.qty}</span><span>${(i.prix*i.qty).toFixed(3)} DT</span></div>`
+  `<div class="order-line"><span>${i.nom}${i.couleur ? ' - ' + i.couleur : ''}${i.taille ? ' - ' + i.taille : ''} ×${i.qty}</span><span>${(i.prix*i.qty).toFixed(3)} DT</span></div>`
 ).join('');
 document.getElementById('summaryTotal').textContent = total.toFixed(3) + ' DT';
 
 function prepareSubmit() {
+  var gouv = document.getElementById('gouvernorat').value;
+  var ville = document.getElementById('ville').value;
+  var comp = document.getElementById('adresse_comp').value;
+  document.getElementById('adresseData').value = gouv + ' | ' + ville + ' | ' + comp;
   document.getElementById('panierData').value = JSON.stringify(cart);
   localStorage.removeItem('cart');
 }

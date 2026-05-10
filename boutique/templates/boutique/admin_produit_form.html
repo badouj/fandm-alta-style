@@ -57,6 +57,13 @@
     </div>
 
     <div class="form-group">
+      <label class="form-label">Couleur</label>
+      <input type="text" name="couleur" class="form-input"
+        value="{% if produit %}{{ produit.couleur }}{% endif %}"
+        placeholder="ex: Vert, Rouge, Bleu...">
+    </div>
+
+    <div class="form-group">
       <label class="form-label">Description *</label>
       <textarea name="description" class="form-input" rows="4"
         placeholder="Description du produit...">{% if produit %}{{ produit.description }}{% endif %}</textarea>

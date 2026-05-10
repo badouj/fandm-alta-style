@@ -1,0 +1,93 @@
+{% extends 'boutique/base.html' %}
+{% block content %}
+<style>
+.commandes-wrapper{max-width:1200px;margin:0 auto;padding:2.5rem 2rem}
+.commandes-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;padding-bottom:1rem;border-bottom:2px solid var(--gold)}
+.commandes-header h1{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:700}
+.commandes-header h1 span{color:var(--gold)}
+.filters-bar{display:flex;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap;align-items:center}
+.search-input{flex:1;min-width:200px;border:1px solid var(--border);padding:10px 16px;font-family:'Montserrat',sans-serif;font-size:0.85rem;outline:none;transition:border-color 0.3s;background:var(--white)}
+.search-input:focus{border-color:var(--gold)}
+.filter-btn{background:none;border:1px solid var(--border);padding:8px 16px;font-family:'Montserrat',sans-serif;font-size:0.7rem;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all 0.3s}
+.filter-btn:hover,.filter-btn.active{background:var(--black);color:var(--white);border-color:var(--black)}
+.admin-table{width:100%;border-collapse:collapse}
+.admin-table th{font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--gray);padding:0.75rem 1rem;text-align:left;border-bottom:2px solid var(--border)}
+.admin-table td{padding:0.85rem 1rem;font-size:0.85rem;border-bottom:1px solid var(--border);vertical-align:middle}
+.admin-table tr:hover td{background:var(--cream)}
+.badge-nouveau{background:#fff3cd;color:#856404;padding:3px 10px;font-size:0.65rem;letter-spacing:1px;text-transform:uppercase}
+.badge-confirme{background:#d4edda;color:#155724;padding:3px 10px;font-size:0.65rem;letter-spacing:1px;text-transform:uppercase}
+.badge-livre{background:#d1ecf1;color:#0c5460;padding:3px 10px;font-size:0.65rem;letter-spacing:1px;text-transform:uppercase}
+.badge-annule{background:#f8d7da;color:#721c24;padding:3px 10px;font-size:0.65rem;letter-spacing:1px;text-transform:uppercase}
+.btn-view{background:none;border:1px solid var(--gold);padding:5px 12px;font-size:0.65rem;letter-spacing:1px;text-transform:uppercase;cursor:pointer;text-decoration:none;color:var(--gold);transition:all 0.3s;font-family:'Montserrat',sans-serif}
+.btn-view:hover{background:var(--gold);color:var(--white)}
+</style>
+
+<div class="commandes-wrapper">
+  <div class="commandes-header">
+    <h1>Les <span>Commandes</span></h1>
+    <a href="/mon-admin/" class="btn-outline">← Retour</a>
+  </div>
+
+  <div class="filters-bar">
+    <input type="text" class="search-input" id="searchInput" placeholder="🔍 Rechercher par client ou téléphone..." oninput="filterCommandes()">
+    <button class="filter-btn active" onclick="setFilter(this, 'all')">Tous</button>
+    <button class="filter-btn" onclick="setFilter(this, 'nouveau')">Nouveau</button>
+    <button class="filter-btn" onclick="setFilter(this, 'confirme')">Confirmé</button>
+    <button class="filter-btn" onclick="setFilter(this, 'livre')">Livré</button>
+    <button class="filter-btn" onclick="setFilter(this, 'annule')">Annulé</button>
+  </div>
+
+  <table class="admin-table" id="commandesTable">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Client</th>
+        <th>Téléphone</th>
+        <th>Total</th>
+        <th>Statut</th>
+        <th>Date</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for commande in commandes %}
+      <tr data-client="{{ commande.nom_client|lower }}" data-tel="{{ commande.telephone }}" data-statut="{{ commande.statut }}">
+        <td><strong>#{{ commande.id }}</strong></td>
+        <td>{{ commande.nom_client }}</td>
+        <td>{{ commande.telephone }}</td>
+        <td style="color:var(--gold);font-weight:600">{{ commande.total }} DT</td>
+        <td><span class="badge-{{ commande.statut }}">{{ commande.get_statut_display }}</span></td>
+        <td style="font-size:0.75rem;color:var(--gray)">{{ commande.date_commande|date:"d/m/Y H:i" }}</td>
+        <td><a href="/mon-admin/commande/{{ commande.pk }}/" class="btn-view">Détails</a></td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--gray)">Aucune commande</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<script>
+var currentFilter = 'all';
+
+function setFilter(btn, statut) {
+  currentFilter = statut;
+  document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
+  filterCommandes();
+}
+
+function filterCommandes() {
+  var query = document.getElementById('searchInput').value.toLowerCase().trim();
+  var rows = document.querySelectorAll('#commandesTable tbody tr[data-client]');
+  rows.forEach(function(row) {
+    var client = row.getAttribute('data-client') || '';
+    var tel = row.getAttribute('data-tel') || '';
+    var statut = row.getAttribute('data-statut') || '';
+    var matchFilter = (currentFilter === 'all' || statut === currentFilter);
+    var matchSearch = !query || client.indexOf(query) !== -1 || tel.indexOf(query) !== -1;
+    row.style.display = (matchFilter && matchSearch) ? '' : 'none';
+  });
+}
+</script>
+{% endblock %}

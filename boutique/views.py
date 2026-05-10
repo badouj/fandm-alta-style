@@ -4,6 +4,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from .models import Produit, ProduitVariant, ProduitImage, Commande, LigneCommande
 import json
+import requests as http_requests
 
 def accueil(request):
     produits = Produit.objects.filter(disponible=True)[:3]
@@ -36,14 +37,18 @@ def produit_detail(request, pk):
         variants_data.append({
             'id': v.id,
             'taille': v.taille,
+            'couleur': v.couleur if v.couleur else produit.couleur,
             'stock': v.stock
         })
     variants_json = json.dumps(variants_data)
+    couleurs = list(set(v.couleur if v.couleur else produit.couleur for v in variants if (v.couleur or produit.couleur)))
+    couleurs.sort()
     return render(request, 'boutique/produit_detail.html', {
         'produit': produit,
         'variants': variants,
         'variants_json': variants_json,
         'images': images,
+        'couleurs': couleurs,
     })
 
 def commande(request):
@@ -76,7 +81,8 @@ def commande(request):
                 variant=variant,
                 quantite=item['qty'],
                 prix_unitaire=item['prix'],
-                taille=item.get('taille', '')
+                taille=item.get('taille', ''),
+                couleur=item.get('couleur', '')
             )
         return render(request, 'boutique/success.html', {'commande': cmd})
     return render(request, 'boutique/commande.html')
@@ -116,6 +122,7 @@ def admin_produit_ajouter(request):
             prix=request.POST['prix'],
             categorie=request.POST['categorie'],
             sous_categorie=request.POST.get('sous_categorie', ''),
+            couleur=request.POST.get('couleur', ''),
             image=request.FILES.get('image'),
             disponible='disponible' in request.POST
         )
@@ -133,6 +140,7 @@ def admin_produit_modifier(request, pk):
         produit.prix = request.POST['prix']
         produit.categorie = request.POST['categorie']
         produit.sous_categorie = request.POST.get('sous_categorie', '')
+        produit.couleur = request.POST.get('couleur', '')
         produit.disponible = 'disponible' in request.POST
         if request.FILES.get('image'):
             produit.image = request.FILES['image']
@@ -172,10 +180,12 @@ def admin_variant_ajouter(request, produit_pk):
     produit = get_object_or_404(Produit, pk=produit_pk)
     if request.method == 'POST':
         taille = request.POST.get('taille', '').strip()
+        couleur = request.POST.get('couleur', '').strip()
         stock = int(request.POST.get('stock', 0))
         variant, created = ProduitVariant.objects.get_or_create(
             produit=produit,
             taille=taille,
+            couleur=couleur,
             defaults={'stock': stock}
         )
         if not created:
@@ -205,3 +215,119 @@ def admin_image_supprimer(request, pk):
     produit_pk = image.produit.pk
     image.delete()
     return redirect('admin_produit_modifier', pk=produit_pk)
+
+
+def inscription(request):
+    error = None
+    if request.method == 'POST':
+        nom = request.POST.get('nom', '').strip()
+        email = request.POST.get('email', '').strip()
+        telephone = request.POST.get('telephone', '').strip()
+        password = request.POST.get('password', '').strip()
+        password2 = request.POST.get('password2', '').strip()
+        if not nom or not email or not telephone or not password:
+            error = "Veuillez remplir tous les champs."
+        elif password != password2:
+            error = "Les mots de passe ne correspondent pas."
+        elif len(password) < 6:
+            error = "Le mot de passe doit contenir au moins 6 caractères."
+        else:
+            from django.contrib.auth.models import User
+            if User.objects.filter(username=email).exists():
+                error = "Un compte avec cet email existe déjà."
+            else:
+                user = User.objects.create_user(username=email, email=email, password=password, first_name=nom)
+                login(request, user)
+                return redirect('accueil')
+    return render(request, 'boutique/inscription.html', {'error': error, 'success': False})
+
+
+def connexion(request):
+    error = None
+    if request.method == 'POST':
+        email = request.POST.get('email', '').strip()
+        password = request.POST.get('password', '').strip()
+        user = authenticate(request, username=email, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('accueil')
+        else:
+            error = "Email ou mot de passe incorrect."
+    return render(request, 'boutique/connexion.html', {'error': error})
+
+
+def deconnexion(request):
+    logout(request)
+    return redirect('accueil')
+
+
+def favoris(request):
+    if not request.user.is_authenticated:
+        return redirect('connexion')
+    return render(request, 'boutique/favoris.html')
+
+
+@login_required(login_url='/mon-admin/login/')
+def admin_commandes(request):
+    commandes = Commande.objects.all().order_by('-date_commande')
+    return render(request, 'boutique/admin_commandes.html', {'commandes': commandes})
+
+
+@login_required(login_url='/mon-admin/login/')
+def envoyer_first_delivery(request, pk):
+    commande = get_object_or_404(Commande, pk=pk)
+    if request.method == 'POST':
+        token = '088a94c7-6b7a-4c98-911a-8bd3b6cca55d'
+
+        designation = ', '.join([
+            f"{l.produit.nom}{' - ' + l.couleur if l.couleur else ''}{' - ' + l.taille if l.taille else ''}"
+            for l in commande.lignes.all()
+        ])
+        nombre_articles = sum(l.quantite for l in commande.lignes.all())
+
+        adresse_parts = commande.adresse.split(' | ')
+        gouvernerat = adresse_parts[0] if len(adresse_parts) > 0 else commande.adresse
+        ville = adresse_parts[1] if len(adresse_parts) > 1 else commande.adresse
+        adresse_comp = adresse_parts[2] if len(adresse_parts) > 2 else commande.adresse
+
+        data = {
+            "Client": {
+                "nom": commande.nom_client,
+                "gouvernerat": gouvernerat,
+                "ville": ville,
+                "adresse": adresse_comp,
+                "telephone": commande.telephone,
+                "telephone2": ""
+            },
+            "Produit": {
+                "prix": float(commande.total),
+                "designation": designation,
+                "nombreArticle": nombre_articles,
+                "commentaire": commande.notes or "",
+                "article": designation,
+                "nombreEchange": 0
+            }
+        }
+
+        try:
+            response = http_requests.post(
+                'https://www.firstdeliverygroup.com/api/v2/create',
+                json=data,
+                headers={
+                    'Authorization': f'Bearer {token}',
+                    'Content-Type': 'application/json'
+                },
+                timeout=10
+            )
+            result = response.json()
+            if response.status_code == 200 and not result.get('isError'):
+                commande.statut = 'confirme'
+                commande.save()
+                return redirect(f'/mon-admin/commande/{pk}/?success=1')
+            else:
+                msg = str(result.get('message', str(result)))[:100]
+                return redirect(f'/mon-admin/commande/{pk}/?error={msg}')
+        except Exception as e:
+            return redirect(f'/mon-admin/commande/{pk}/?error={str(e)[:100]}')
+
+    return redirect(f'/mon-admin/commande/{pk}/')

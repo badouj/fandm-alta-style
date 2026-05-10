@@ -1,0 +1,55 @@
+{% extends 'boutique/base.html' %}
+{% block content %}
+<style>
+.inscription-wrapper{max-width:480px;margin:4rem auto;padding:0 2rem}
+.inscription-title{font-family:'Cormorant Garamond',serif;font-size:2.2rem;font-weight:700;text-align:center;margin-bottom:0.5rem}
+.inscription-title span{color:var(--gold);font-style:italic}
+.inscription-sub{text-align:center;font-size:0.8rem;color:var(--gray);margin-bottom:2.5rem}
+.form-group{margin-bottom:1.5rem}
+.form-label{display:block;font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--gray);margin-bottom:0.5rem}
+.form-input{width:100%;border:1px solid var(--border);padding:12px 16px;font-family:'Montserrat',sans-serif;font-size:0.85rem;outline:none;transition:border-color 0.3s;background:var(--white)}
+.form-input:focus{border-color:var(--gold)}
+.btn-inscription{width:100%;background:var(--black);color:var(--white);border:none;padding:14px;font-family:'Montserrat',sans-serif;font-size:0.75rem;letter-spacing:3px;text-transform:uppercase;cursor:pointer;transition:background 0.3s;margin-top:0.5rem}
+.btn-inscription:hover{background:var(--gold)}
+.error-msg{background:#f8d7da;color:#721c24;padding:12px 16px;font-size:0.8rem;margin-bottom:1.5rem;text-align:center}
+.login-link{text-align:center;margin-top:1.5rem;font-size:0.8rem;color:var(--gray)}
+.login-link a{color:var(--gold);text-decoration:none}
+.login-link a:hover{text-decoration:underline}
+</style>
+
+<div class="inscription-wrapper">
+  <h1 class="inscription-title">Créer un <span>Compte</span></h1>
+  <p class="inscription-sub">Rejoignez F&M Alta Style</p>
+
+  {% if error %}
+  <div class="error-msg">{{ error }}</div>
+  {% endif %}
+
+  <form method="POST">
+    {% csrf_token %}
+    <div class="form-group">
+      <label class="form-label">Nom Complet *</label>
+      <input type="text" name="nom" class="form-input" required placeholder="Votre nom complet">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Email *</label>
+      <input type="email" name="email" class="form-input" required placeholder="votre@email.com">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Téléphone *</label>
+      <input type="tel" name="telephone" class="form-input" required placeholder="+216 XX XXX XXX">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Mot de passe *</label>
+      <input type="password" name="password" class="form-input" required placeholder="Minimum 6 caractères">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Confirmer le mot de passe *</label>
+      <input type="password" name="password2" class="form-input" required placeholder="Répétez le mot de passe">
+    </div>
+    <button type="submit" class="btn-inscription">S'inscrire</button>
+  </form>
+
+  <p class="login-link">Déjà un compte ? <a href="/connexion/">Se connecter</a></p>
+</div>
+{% endblock %}

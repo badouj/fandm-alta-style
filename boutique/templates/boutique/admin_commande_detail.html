@@ -20,9 +20,13 @@
 .lignes-table td{padding:0.85rem;font-size:0.85rem;border-bottom:1px solid var(--border)}
 .total-bar{background:var(--black);color:var(--white);padding:1rem 1.5rem;display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem}
 .total-bar span{color:var(--gold);font-size:1.2rem;font-weight:600}
-.statut-form{display:flex;gap:1rem;align-items:center}
+.statut-form{display:flex;gap:1rem;align-items:center;margin-bottom:1.5rem}
 .form-input{border:1px solid var(--border);padding:10px 14px;font-family:'Montserrat',sans-serif;font-size:0.85rem;outline:none;background:var(--white)}
 .form-input:focus{border-color:var(--gold)}
+.btn-delivery{background:#25D366;color:var(--white);border:none;padding:12px 24px;font-family:'Montserrat',sans-serif;font-size:0.72rem;letter-spacing:2px;text-transform:uppercase;cursor:pointer;text-decoration:none;display:inline-block;transition:background 0.3s;margin-top:1rem;width:100%;text-align:center}
+.btn-delivery:hover{background:#1da851}
+.alert-success{background:#d4edda;color:#155724;padding:12px 16px;margin-top:1rem;font-size:0.85rem}
+.alert-error{background:#f8d7da;color:#721c24;padding:12px 16px;margin-top:1rem;font-size:0.85rem}
 </style>
 
 <div class="detail-wrapper">
@@ -62,6 +66,8 @@
     <thead>
       <tr>
         <th>Produit</th>
+        <th>Couleur</th>
+        <th>Taille</th>
         <th>Prix Unitaire</th>
         <th>Quantité</th>
         <th>Sous-total</th>
@@ -71,6 +77,8 @@
       {% for ligne in commande.lignes.all %}
       <tr>
         <td><strong>{{ ligne.produit.nom }}</strong></td>
+        <td>{{ ligne.couleur|default:"—" }}</td>
+        <td>{{ ligne.taille|default:"—" }}</td>
         <td>{{ ligne.prix_unitaire }} DT</td>
         <td>× {{ ligne.quantite }}</td>
         <td style="color:var(--gold);font-weight:600">{{ ligne.prix_unitaire|floatformat:3 }} DT</td>
@@ -93,6 +101,20 @@
       <option value="annule" {% if commande.statut == 'annule' %}selected{% endif %}>Annulé</option>
     </select>
     <button type="submit" class="btn-primary">Mettre à jour le statut</button>
+  </form>
+
+  {% if request.GET.success %}
+  <div class="alert-success">✅ Commande envoyée à First Delivery avec succès!</div>
+  {% endif %}
+  {% if request.GET.error %}
+  <div class="alert-error">❌ Erreur lors de l'envoi à First Delivery. Vérifiez les données.</div>
+  {% endif %}
+
+  <form method="POST" action="/mon-admin/commande/{{ commande.pk }}/first-delivery/">
+    {% csrf_token %}
+    <button type="submit" class="btn-delivery">
+      🚚 Envoyer à First Delivery
+    </button>
   </form>
 </div>
 {% endblock %}

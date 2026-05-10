@@ -16,10 +16,13 @@
 .main-header small{font-size:0.7rem;letter-spacing:3px;text-transform:uppercase;color:var(--gold);display:block;margin-bottom:0.4rem}
 .main-header h2{font-family:'Cormorant Garamond',serif;font-size:2.8rem;font-weight:700;color:var(--black);line-height:1}
 .products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:1.5rem}
-.product-card{background:var(--white);border:1px solid var(--border);transition:box-shadow 0.3s,transform 0.3s;cursor:pointer}
+.product-card{background:var(--white);border:1px solid var(--border);transition:box-shadow 0.3s,transform 0.3s;cursor:pointer;position:relative}
 .product-card:hover{box-shadow:0 6px 24px rgba(0,0,0,0.09);transform:translateY(-3px)}
-.prod-img{width:100%;aspect-ratio:4/3;background:#f5f5f5;display:flex;align-items:center;justify-content:center;font-size:4rem;overflow:hidden}
+.prod-img{width:100%;height:320px;background:#f5f5f5;display:flex;align-items:center;justify-content:center;font-size:4rem;overflow:hidden;position:relative}
 .prod-img img{width:100%;height:100%;object-fit:cover}
+.fav-btn-card{position:absolute;top:8px;right:8px;background:rgba(255,255,255,0.9);border:none;width:34px;height:34px;border-radius:50%;font-size:1.1rem;cursor:pointer;transition:all 0.3s;color:var(--gray);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,0.15);z-index:10}
+.fav-btn-card:hover{background:white;color:#e53e3e;transform:scale(1.1)}
+.fav-btn-card.active{color:#e53e3e;background:white}
 .prod-body{padding:1rem 1rem 0}
 .prod-name{font-size:1rem;font-weight:600;margin-bottom:0.3rem;color:var(--black)}
 .prod-desc{font-size:0.75rem;color:#888;line-height:1.6}
@@ -33,9 +36,7 @@
   <aside class="sidebar">
     <p class="sidebar-title">Catégories</p>
     <hr class="sidebar-divider">
-
     <a href="/catalogue/" class="sidebar-link {% if categorie == 'all' %}active{% endif %}">Tous les produits</a>
-
     <p class="sidebar-section">Femme</p>
     <a href="/catalogue/?cat=femme" class="sidebar-link {% if categorie == 'femme' and not sous_categorie %}active{% endif %}">Tous Femme</a>
     <a href="/catalogue/?cat=femme&sous=jebba_f" class="sidebar-sublink {% if sous_categorie == 'jebba_f' %}active{% endif %}">↳ Jebba</a>
@@ -43,13 +44,11 @@
     <a href="/catalogue/?cat=femme&sous=kachabiya_f" class="sidebar-sublink {% if sous_categorie == 'kachabiya_f' %}active{% endif %}">↳ Kachabiya</a>
     <a href="/catalogue/?cat=femme&sous=cape" class="sidebar-sublink {% if sous_categorie == 'cape' %}active{% endif %}">↳ Cape</a>
     <a href="/catalogue/?cat=femme&sous=kamis_f" class="sidebar-sublink {% if sous_categorie == 'kamis_f' %}active{% endif %}">↳ Kamis</a>
-
     <p class="sidebar-section">Homme</p>
     <a href="/catalogue/?cat=homme" class="sidebar-link {% if categorie == 'homme' and not sous_categorie %}active{% endif %}">Tous Homme</a>
     <a href="/catalogue/?cat=homme&sous=herga_h" class="sidebar-sublink {% if sous_categorie == 'herga_h' %}active{% endif %}">↳ Herga</a>
     <a href="/catalogue/?cat=homme&sous=dengri_h" class="sidebar-sublink {% if sous_categorie == 'dengri_h' %}active{% endif %}">↳ Dengri</a>
     <a href="/catalogue/?cat=homme&sous=burnous" class="sidebar-sublink {% if sous_categorie == 'burnous' %}active{% endif %}">↳ Burnous</a>
-
     <p class="sidebar-section">Enfants</p>
     <a href="/catalogue/?cat=enfants" class="sidebar-link {% if categorie == 'enfants' and not sous_categorie %}active{% endif %}">Tous Enfants</a>
     <a href="/catalogue/?cat=enfants&sous=jebba_e" class="sidebar-sublink {% if sous_categorie == 'jebba_e' %}active{% endif %}">↳ Jebba</a>
@@ -70,6 +69,17 @@
           {% if produit.image %}
           <img src="{{ produit.image.url }}" alt="{{ produit.nom }}">
           {% else %}🥻{% endif %}
+          <button class="fav-btn-card"
+            id="fav-{{ produit.id }}"
+            data-id="{{ produit.id }}"
+            data-nom="{{ produit.nom|escapejs }}"
+            data-prix="{{ produit.prix }}"
+            data-couleur="{{ produit.couleur|escapejs }}"
+            data-image="{% if produit.image %}{{ produit.image.url }}{% endif %}"
+            onclick="event.stopPropagation();toggleFavCatalogue(this)"
+            title="Ajouter aux favoris">
+            ♡
+          </button>
         </div>
         <div class="prod-body">
           <p class="prod-name">{{ produit.nom }}</p>
@@ -93,5 +103,46 @@
 {% endblock %}
 
 {% block scripts %}
-<script></script>
+<script>
+var isAuth = "{{ user.is_authenticated }}" === "True";
+var currentUser = "{% if user.is_authenticated %}{{ user.username }}{% else %}anonymous{% endif %}";
+var favsKey = 'favoris_' + currentUser;
+
+var favs = JSON.parse(localStorage.getItem(favsKey) || '[]');
+document.querySelectorAll('.fav-btn-card').forEach(function(btn) {
+  var id = parseInt(btn.dataset.id);
+  var isFav = favs.some(function(f) { return f.id === id; });
+  if (isFav) {
+    btn.textContent = '♥';
+    btn.classList.add('active');
+  }
+});
+
+function toggleFavCatalogue(btn) {
+  if (!isAuth) {
+    window.location.href = '/inscription/';
+    return;
+  }
+  var id = parseInt(btn.dataset.id);
+  var nom = btn.dataset.nom;
+  var prix = parseFloat(btn.dataset.prix);
+  var couleur = btn.dataset.couleur || '';
+  var image = btn.dataset.image || '';
+  var favs = JSON.parse(localStorage.getItem(favsKey) || '[]');
+  var idx = favs.findIndex(function(f) { return f.id === id; });
+
+  if (idx === -1) {
+    favs.push({id: id, nom: nom, prix: prix, couleur: couleur, image: image});
+    localStorage.setItem(favsKey, JSON.stringify(favs));
+    btn.textContent = '♥';
+    btn.classList.add('active');
+  } else {
+    favs.splice(idx, 1);
+    localStorage.setItem(favsKey, JSON.stringify(favs));
+    btn.textContent = '♡';
+    btn.classList.remove('active');
+  }
+  updateFavCount();
+}
+</script>
 {% endblock %}

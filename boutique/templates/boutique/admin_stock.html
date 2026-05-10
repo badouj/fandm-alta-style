@@ -2,13 +2,19 @@
 {% block content %}
 <style>
 .stock-wrapper{max-width:1200px;margin:0 auto;padding:2.5rem 2rem}
-.stock-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:2rem;padding-bottom:1rem;border-bottom:2px solid var(--gold)}
+.stock-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;padding-bottom:1rem;border-bottom:2px solid var(--gold)}
 .stock-header h1{font-family:'Cormorant Garamond',serif;font-size:2rem;font-weight:700}
 .stock-header h1 span{color:var(--gold)}
+.filters-bar{display:flex;gap:1rem;margin-bottom:1.5rem;flex-wrap:wrap;align-items:center}
+.search-input{flex:1;min-width:200px;border:1px solid var(--border);padding:12px 16px;font-family:'Montserrat',sans-serif;font-size:0.85rem;outline:none;transition:border-color 0.3s;background:var(--white)}
+.search-input:focus{border-color:var(--gold)}
+.filter-btn{background:none;border:1px solid var(--border);padding:10px 20px;font-family:'Montserrat',sans-serif;font-size:0.75rem;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all 0.3s}
+.filter-btn:hover,.filter-btn.active{background:var(--black);color:var(--white);border-color:var(--black)}
 .produit-block{background:var(--white);border:1px solid var(--border);margin-bottom:2rem}
 .produit-header{display:flex;justify-content:space-between;align-items:center;padding:1rem 1.5rem;background:var(--cream);border-bottom:1px solid var(--border)}
 .produit-header h3{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:600}
 .produit-header small{font-size:0.7rem;letter-spacing:2px;text-transform:uppercase;color:var(--gold)}
+.produit-couleur{font-size:0.85rem;color:var(--gray);margin-left:0.5rem}
 .variants-table{width:100%;border-collapse:collapse}
 .variants-table th{font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--gray);padding:0.75rem 1.5rem;text-align:left;border-bottom:1px solid var(--border)}
 .variants-table td{padding:0.75rem 1.5rem;font-size:0.85rem;border-bottom:1px solid var(--border)}
@@ -26,6 +32,7 @@
 .btn-add{background:none;border:1px solid var(--gold);color:var(--gold);padding:8px 16px;font-family:'Montserrat',sans-serif;font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;cursor:pointer;text-decoration:none;transition:all 0.3s;display:inline-block}
 .btn-add:hover{background:var(--gold);color:var(--white)}
 .no-variants{padding:1.5rem;text-align:center;color:var(--gray);font-size:0.85rem}
+.no-results{text-align:center;color:var(--gray);font-size:0.9rem;padding:2rem;display:none}
 </style>
 
 <div class="stock-wrapper">
@@ -34,11 +41,21 @@
     <a href="/mon-admin/" class="btn-outline">← Retour</a>
   </div>
 
+  <div class="filters-bar">
+    <input type="text" class="search-input" id="searchInput" placeholder="🔍 Rechercher par nom-couleur... (ex: dengri-bleu)" oninput="filterProduits()">
+    <button class="filter-btn active" onclick="setFilter(this, 'all')">Tous</button>
+    <button class="filter-btn" onclick="setFilter(this, 'femme')">Femme</button>
+    <button class="filter-btn" onclick="setFilter(this, 'homme')">Homme</button>
+    <button class="filter-btn" onclick="setFilter(this, 'enfants')">Enfants</button>
+  </div>
+
+  <p class="no-results" id="noResults">Aucun produit trouvé</p>
+
   {% for produit in produits %}
-  <div class="produit-block">
+  <div class="produit-block" data-nom="{{ produit.nom|lower }}" data-couleur="{{ produit.couleur|lower }}" data-cat="{{ produit.categorie }}">
     <div class="produit-header">
       <div>
-        <h3>{{ produit.nom }}</h3>
+        <h3>{{ produit.nom }}{% if produit.couleur %}<span class="produit-couleur">— {{ produit.couleur }}</span>{% endif %}</h3>
         <small>{{ produit.get_categorie_display }} — {{ produit.get_sous_categorie_display }}</small>
       </div>
       <a href="/mon-admin/stock/ajouter/{{ produit.pk }}/" class="btn-add">+ Ajouter Taille</a>
@@ -90,4 +107,51 @@
   </div>
   {% endfor %}
 </div>
+
+<script>
+var currentCat = 'all';
+
+function setFilter(btn, cat) {
+  currentCat = cat;
+  document.querySelectorAll('.filter-btn').forEach(function(b) {
+    b.classList.remove('active');
+  });
+  btn.classList.add('active');
+  filterProduits();
+}
+
+function filterProduits() {
+  var query = document.getElementById('searchInput').value.toLowerCase().trim();
+  var parts = query.split('-');
+  var searchNom = parts[0] || '';
+  var searchCouleur = parts[1] || '';
+  var blocks = document.querySelectorAll('.produit-block');
+  var found = 0;
+
+  blocks.forEach(function(block) {
+    var nom = block.getAttribute('data-nom') || '';
+    var couleur = block.getAttribute('data-couleur') || '';
+    var cat = block.getAttribute('data-cat') || '';
+
+    var matchCat = (currentCat === 'all' || cat === currentCat);
+    var matchSearch = true;
+
+    if (searchNom) {
+      matchSearch = nom.indexOf(searchNom) !== -1;
+    }
+    if (matchSearch && searchCouleur) {
+      matchSearch = couleur.indexOf(searchCouleur) !== -1;
+    }
+
+    if (matchCat && matchSearch) {
+      block.style.display = '';
+      found++;
+    } else {
+      block.style.display = 'none';
+    }
+  });
+
+  document.getElementById('noResults').style.display = found === 0 ? 'block' : 'none';
+}
+</script>
 {% endblock %}

@@ -17,7 +17,7 @@
   <h2 class="form-title">Ajouter une <span>Taille</span></h2>
 
   <div class="produit-info">
-    Produit : <strong>{{ produit.nom }}</strong>
+    Produit : <strong>{{ produit.nom }}{% if produit.couleur %} — {{ produit.couleur }}{% endif %}</strong>
   </div>
 
   <form method="POST">

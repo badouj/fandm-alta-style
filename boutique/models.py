@@ -7,6 +7,7 @@ class Produit(models.Model):
         ('homme', 'Homme'),
         ('enfants', 'Enfants'),
     ]
+
     SOUS_CATEGORIES = [
         ('jebba_f', 'Jebba Femme'),
         ('dengri_f', 'Dengri Femme'),
@@ -22,11 +23,13 @@ class Produit(models.Model):
         ('herga_e', 'Herga Enfant'),
         ('autre', 'Autre'),
     ]
+
     nom = models.CharField(max_length=200)
     description = models.TextField()
     prix = models.DecimalField(max_digits=10, decimal_places=3)
     categorie = models.CharField(max_length=50, choices=CATEGORIES)
     sous_categorie = models.CharField(max_length=50, choices=SOUS_CATEGORIES, blank=True, default='')
+    couleur = models.CharField(max_length=100, blank=True, default='')
     image = models.ImageField(upload_to='produits/', blank=True, null=True)
     disponible = models.BooleanField(default=True)
     date_ajout = models.DateTimeField(auto_now_add=True)
@@ -41,13 +44,16 @@ class Produit(models.Model):
 class ProduitVariant(models.Model):
     produit = models.ForeignKey(Produit, on_delete=models.CASCADE, related_name='variants')
     taille = models.CharField(max_length=20)
+    couleur = models.CharField(max_length=100, blank=True, default='')
     stock = models.IntegerField(default=0)
 
     def __str__(self):
+        if self.couleur:
+            return f"{self.produit.nom} - {self.taille} - {self.couleur}"
         return f"{self.produit.nom} - {self.taille}"
 
     class Meta:
-        unique_together = ['produit', 'taille']
+        unique_together = ['produit', 'taille', 'couleur']
 
 
 class ProduitImage(models.Model):
@@ -61,10 +67,11 @@ class ProduitImage(models.Model):
 class Commande(models.Model):
     STATUTS = [
         ('nouveau', 'Nouveau'),
-        ('confirme', 'Confirme'),
-        ('livre', 'Livre'),
-        ('annule', 'Annule'),
+        ('confirme', 'Confirmé'),
+        ('livre', 'Livré'),
+        ('annule', 'Annulé'),
     ]
+
     nom_client = models.CharField(max_length=200)
     telephone = models.CharField(max_length=20)
     adresse = models.TextField()
@@ -84,6 +91,7 @@ class LigneCommande(models.Model):
     quantite = models.IntegerField(default=1)
     prix_unitaire = models.DecimalField(max_digits=10, decimal_places=3)
     taille = models.CharField(max_length=20, blank=True, default='')
+    couleur = models.CharField(max_length=100, blank=True, default='')
 
     def __str__(self):
         return f"{self.produit.nom} x{self.quantite}"

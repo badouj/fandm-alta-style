@@ -23,6 +23,17 @@ nav{background:var(--dark);padding:0 2.5rem;display:flex;align-items:center;just
 .nav-links{display:flex;gap:2.5rem;list-style:none}
 .nav-links a{text-decoration:none;font-size:0.8rem;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.8);font-weight:400;transition:color 0.3s}
 .nav-links a:hover{color:var(--gold)}
+.nav-right{display:flex;align-items:center;gap:1rem}
+.btn-inscrire{background:none;border:1px solid var(--gold);color:var(--gold);padding:6px 16px;font-family:'Montserrat',sans-serif;font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;text-decoration:none;transition:all 0.3s;border-radius:2px}
+.btn-inscrire:hover{background:var(--gold);color:var(--white)}
+.btn-connexion{background:none;border:none;color:rgba(255,255,255,0.8);font-family:'Montserrat',sans-serif;font-size:0.65rem;letter-spacing:2px;text-transform:uppercase;text-decoration:none;transition:color 0.3s}
+.btn-connexion:hover{color:var(--gold)}
+.user-name{color:var(--gold);font-size:0.7rem;letter-spacing:1px}
+.btn-logout{background:none;border:none;color:rgba(255,255,255,0.5);font-family:'Montserrat',sans-serif;font-size:0.6rem;letter-spacing:1px;text-decoration:none;transition:color 0.3s}
+.btn-logout:hover{color:#e53e3e}
+.nav-icon-btn{position:relative;background:none;border:none;cursor:pointer;text-decoration:none;display:flex;align-items:center;justify-content:center;width:44px;height:44px;color:var(--white);font-size:1.3rem;transition:color 0.3s}
+.nav-icon-btn:hover{color:var(--gold)}
+.fav-badge{position:absolute;top:4px;right:4px;background:#e53e3e;color:var(--white);border-radius:50%;width:18px;height:18px;font-size:0.6rem;font-weight:600;display:flex;align-items:center;justify-content:center;font-family:'Montserrat',sans-serif}
 .cart-icon-btn{position:relative;background:none;border:none;cursor:pointer;text-decoration:none;display:flex;align-items:center;justify-content:center;width:44px;height:44px}
 .cart-icon-btn svg{width:26px;height:26px;stroke:var(--white);fill:none;stroke-width:1.8;transition:stroke 0.3s}
 .cart-icon-btn:hover svg{stroke:var(--gold)}
@@ -31,6 +42,16 @@ nav{background:var(--dark);padding:0 2.5rem;display:flex;align-items:center;just
 .btn-primary:hover{background:var(--gold)}
 .btn-outline{background:none;color:var(--black);border:1.5px solid var(--black);padding:12px 28px;font-family:'Montserrat',sans-serif;font-size:0.72rem;letter-spacing:2px;text-transform:uppercase;cursor:pointer;text-decoration:none;display:inline-block;transition:all 0.3s}
 .btn-outline:hover{border-color:var(--gold);color:var(--gold)}
+.admin-menu-btn{background:none;border:1px solid var(--gold);color:var(--gold);width:38px;height:38px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;padding:8px;transition:all 0.3s}
+.admin-menu-btn:hover{background:var(--gold)}
+.admin-menu-btn span{display:block;width:18px;height:2px;background:var(--gold);transition:background 0.3s}
+.admin-menu-btn:hover span{background:var(--white)}
+.admin-dropdown{position:absolute;top:65px;right:0;background:var(--dark);border:1px solid var(--gold);min-width:220px;display:none;flex-direction:column;z-index:200}
+.admin-dropdown.open{display:flex}
+.admin-dropdown a{display:block;padding:14px 20px;font-family:'Montserrat',sans-serif;font-size:0.7rem;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.8);text-decoration:none;border-bottom:1px solid rgba(255,255,255,0.1);transition:all 0.3s}
+.admin-dropdown a:hover{background:var(--gold);color:var(--white)}
+.admin-dropdown a:last-child{border-bottom:none}
+.admin-menu-wrapper{position:relative}
 .main-block{flex:1}
 footer{background:#1a1a1a;color:rgba(255,255,255,0.7);margin-top:0;display:block;width:100%}
 .footer-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:3rem;padding:3rem 2.5rem;max-width:1200px;margin:0 auto}
@@ -56,18 +77,49 @@ footer{background:#1a1a1a;color:rgba(255,255,255,0.7);margin-top:0;display:block
   <a class="logo" href="/">F<span>&</span>M <span style="font-size:0.75rem;font-weight:300;letter-spacing:4px">ALTA STYLE</span></a>
   <ul class="nav-links">
     <li><a href="/">Accueil</a></li>
+    <li><a href="/catalogue/">Tous Produits</a></li>
     <li><a href="/catalogue/?cat=femme">Femme</a></li>
     <li><a href="/catalogue/?cat=homme">Homme</a></li>
     <li><a href="/catalogue/?cat=enfants">Enfants</a></li>
   </ul>
-  <a href="/panier/" class="cart-icon-btn">
-    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-      <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
-      <line x1="3" y1="6" x2="21" y2="6"/>
-      <path d="M16 10a4 4 0 01-8 0"/>
-    </svg>
-    <span class="cart-badge" id="cartCount">0</span>
-  </a>
+  <div class="nav-right">
+    {% if user.is_authenticated %}
+      <span class="user-name">Bonjour, {{ user.first_name|default:user.username }}</span>
+      {% if user.is_staff %}
+      <div class="admin-menu-wrapper">
+        <button class="admin-menu-btn" onclick="toggleAdminMenu()" id="adminMenuBtn">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        <div class="admin-dropdown" id="adminDropdown">
+          <a href="/mon-admin/produit/ajouter/">+ Ajouter Produit</a>
+          <a href="/mon-admin/stock/">📦 Gérer Stock</a>
+          <a href="/mon-admin/commandes/">📋 Les Commandes</a>
+          <a href="/mon-admin/">🏠 Dashboard</a>
+        </div>
+      </div>
+      {% endif %}
+      <a href="/deconnexion/" class="btn-logout">Déconnexion</a>
+      {% if not user.is_staff %}
+      <a href="/favoris/" class="nav-icon-btn" title="Mes Favoris">
+        ♡
+        <span class="fav-badge" id="favCount" style="display:none">0</span>
+      </a>
+      <a href="/panier/" class="cart-icon-btn">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/>
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <path d="M16 10a4 4 0 01-8 0"/>
+        </svg>
+        <span class="cart-badge" id="cartCount">0</span>
+      </a>
+      {% endif %}
+    {% else %}
+      <a href="/connexion/" class="btn-connexion">Connexion</a>
+      <a href="/inscription/" class="btn-inscrire">S'inscrire</a>
+    {% endif %}
+  </div>
 </nav>
 
 <div class="main-block">
@@ -80,24 +132,24 @@ footer{background:#1a1a1a;color:rgba(255,255,255,0.7);margin-top:0;display:block
       <p class="footer-logo">F<span>&</span>M <span class="footer-logo-sub">ALTA STYLE</span></p>
       <p class="footer-slogan">L'élégance traditionnelle,<br>le style à portée de main.</p>
       <div class="footer-socials">
-        <a href="#" class="social-link">
+        <a href="https://www.facebook.com/share/18cae474Y3/?mibextid=wwXIfr" target="_blank" class="social-link">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
         </a>
-        <a href="#" class="social-link">
+        <a href="https://www.instagram.com/f_m_altastyles?igsh=MWt0Y2wwYTh1bTdl&utm_source=qr" target="_blank" class="social-link">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
         </a>
-        <a href="#" class="social-link">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+        <a href="https://wa.me/21625127263" target="_blank" class="social-link">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.832-1.438A9.959 9.959 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2z"/></svg>
         </a>
       </div>
     </div>
     <div class="footer-col">
       <p class="footer-col-title">Liens rapides</p>
       <a href="/" class="footer-link">Accueil</a>
+      <a href="/catalogue/" class="footer-link">Tous Produits</a>
       <a href="/catalogue/?cat=femme" class="footer-link">Femme</a>
       <a href="/catalogue/?cat=homme" class="footer-link">Homme</a>
       <a href="/catalogue/?cat=enfants" class="footer-link">Enfants</a>
-      <a href="/panier/" class="footer-link">Mon Panier</a>
     </div>
     <div class="footer-col">
       <p class="footer-col-title">Contactez-nous</p>
@@ -109,10 +161,10 @@ footer{background:#1a1a1a;color:rgba(255,255,255,0.7);margin-top:0;display:block
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="14" height="14"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.67A2 2 0 012 .95h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 8.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
         +216 25127263
       </p>
-      <p class="footer-contact-item">
+      <a href="mailto:alta.style2m@gmail.com" class="footer-contact-item" style="text-decoration:none;color:rgba(255,255,255,0.6)">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="14" height="14"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
         alta.style2m@gmail.com
-      </p>
+      </a>
     </div>
   </div>
   <div class="footer-bottom">
@@ -121,11 +173,48 @@ footer{background:#1a1a1a;color:rgba(255,255,255,0.7);margin-top:0;display:block
 </footer>
 
 <script>
-function updateCartCount(){
-  const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-  document.getElementById('cartCount').textContent = cart.reduce((s,i) => s+i.qty, 0);
+function toggleAdminMenu() {
+  var dropdown = document.getElementById('adminDropdown');
+  dropdown.classList.toggle('open');
 }
+
+document.addEventListener('click', function(e) {
+  var btn = document.getElementById('adminMenuBtn');
+  var dropdown = document.getElementById('adminDropdown');
+  if (btn && dropdown && !btn.contains(e.target) && !dropdown.contains(e.target)) {
+    dropdown.classList.remove('open');
+  }
+});
+
+var currentUser = "{% if user.is_authenticated %}{{ user.username }}{% else %}anonymous{% endif %}";
+var savedUser = localStorage.getItem('cart_user') || '';
+if (savedUser && savedUser !== currentUser) {
+  localStorage.removeItem('cart');
+}
+localStorage.setItem('cart_user', currentUser);
+
+function updateCartCount(){
+  var cart = JSON.parse(localStorage.getItem('cart') || '[]');
+  var el = document.getElementById('cartCount');
+  if(el) el.textContent = cart.reduce(function(s,i){ return s+i.qty; }, 0);
+}
+
+function updateFavCount(){
+  var favsKey = 'favoris_' + currentUser;
+  var favs = JSON.parse(localStorage.getItem(favsKey) || '[]');
+  var el = document.getElementById('favCount');
+  if(el){
+    if(favs.length > 0){
+      el.textContent = favs.length;
+      el.style.display = 'flex';
+    } else {
+      el.style.display = 'none';
+    }
+  }
+}
+
 updateCartCount();
+updateFavCount();
 </script>
 {% block scripts %}{% endblock %}
 </body>
